@@ -516,8 +516,16 @@ let customDB = JSON.parse(localStorage.getItem('custom_bearing_db') || '[]');
 let favorites = JSON.parse(localStorage.getItem('fav_bearings') || '[]');
 let currentModalItem = null;
 
+let extra = {};  // данные, дополненные ИИ для уже существующих подшипников (масса, C, C0, обороты)
+try { extra = JSON.parse(localStorage.getItem('bearing_extra') || '{}'); } catch(e) {}
 function getFullDB() {
-    return [...staticBearingDB, ...customDB];
+    return [...staticBearingDB, ...customDB].map(b => {
+        const e = extra[b.iso];
+        if(!e) return b;
+        const o = { ...b, aiExtra: true };
+        ['weight', 'C', 'C0', 'speed'].forEach(k => { if(!o[k] && e[k]) o[k] = e[k]; });
+        return o;
+    });
 }
 
 function updateCounter() {
@@ -599,8 +607,18 @@ function saveBearingToLocalDB(o) {
     const iso = String(o.iso || "").trim().toUpperCase(), gost = String(o.gost || "").trim(), d = +o.d, D = +o.D, B = +o.B;
     const key = iso || gost;
     if(!key || !(d > 0 && D > d && B > 0)) return false;
-    if(getFullDB().some(b => String(b.iso).toUpperCase() === key || (gost && String(b.gost || "").split(/\s*\/\s*/).includes(gost)))) return false;
     const n = v => +v > 0 ? +v : undefined;
+    const ex = getFullDB().find(b => String(b.iso).toUpperCase() === key || (gost && String(b.gost || "").split(/\s*\/\s*/).includes(gost)));
+    if(ex) {
+        // подшипник уже есть: дополняем только недостающие поля, размеры не трогаем
+        if(Math.abs(ex.d - d) > 0.5 || Math.abs(ex.D - D) > 0.5) return false;
+        const add = {};
+        ['weight', 'C', 'C0', 'speed'].forEach(k => { if(!ex[k] && n(o[k])) add[k] = n(o[k]); });
+        if(!Object.keys(add).length) return false;
+        extra[ex.iso] = Object.assign(extra[ex.iso] || {}, add);
+        localStorage.setItem('bearing_extra', JSON.stringify(extra));
+        return 'updated';
+    }
     customDB.push({ iso: key, gost, d, D, B, weight: n(o.weight), C: n(o.C), C0: n(o.C0), speed: n(o.speed), type: o.type || "Подшипник" });
     localStorage.setItem('custom_bearing_db', JSON.stringify(customDB));
     updateCounter();
@@ -677,6 +695,8 @@ function openModal(iso) {
             <div class="param-item"><span class="param-label">Грузоподъемность (C)</span><span class="param-value">${item.C ? item.C + " кН" : "—"}</span></div>
             <div class="param-item"><span class="param-label">Грузоподъемность (C₀)</span><span class="param-value">${item.C0 ? item.C0 + " кН" : "—"}</span></div>
         </div>
+        ${(!item.weight || !item.C || !item.C0) ? '<button class="btn btn-ds" style="margin-top:14px;width:100%" onclick="fillMissingAI()">🤖 Дополнить массу и нагрузки через ИИ</button>' : ''}
+        ${item.aiExtra ? '<div style="margin-top:10px;color:var(--text-muted)">Часть данных (масса, нагрузки) получена от ИИ: ориентировочно, сверьте с каталогом.</div>' : ''}
     `;
 
     document.getElementById('modal-detail').classList.add('active');
@@ -706,7 +726,7 @@ async function askAI() {
         const o = await r.json();
         if(!r.ok) throw new Error(o.error || 'HTTP ' + r.status);
         const saved = saveBearingToLocalDB(o.bearing);
-        out.innerText = (o.answer || '') + (saved ? '\n\n✅ Сохранено в базу на вашем телефоне (данные ИИ: сверьте с каталогом).' : '') + (!saved && o.bearing ? '\n\nℹ️ Такой подшипник уже есть в базе или данные неполные.' : '');
+        out.innerText = (o.answer || '') + (saved === true ? '\n\n✅ Сохранено в базу на вашем телефоне (данные ИИ: сверьте с каталогом).' : '') + (saved === 'updated' ? '\n\n✅ Данные подшипника дополнены (масса и нагрузки по ИИ, ориентировочно: сверьте с каталогом).' : '') + (!saved && o.bearing ? '\n\nℹ️ Такой подшипник уже есть в базе, новых данных нет или размеры не совпали.' : '');
         handleSearch();
     } catch(e) {
         out.innerText = 'Не получилось: ' + e.message;
@@ -719,6 +739,14 @@ function searchViaAI(query) {
     askAI();
 }
 
+function fillMissingAI() {
+    if(!currentModalItem) return;
+    const b = currentModalItem;
+    closeModal();
+    switchTab('ai');
+    document.getElementById('ai-prompt').value = `Подшипник ${b.iso}${b.gost ? " (ГОСТ " + b.gost + ")" : ""}, размеры ${b.d}x${b.D}x${b.B} мм. Укажи массу (кг), динамическую грузоподъёмность C (кН), статическую C0 (кН) и предельную частоту вращения (об/мин). Если не уверен в значении, ставь null. Заполни поле bearing с теми же iso, d, D, B.`;
+    askAI();
+}
 function consultModalAI() {
     if(!currentModalItem) return;
     closeModal();
