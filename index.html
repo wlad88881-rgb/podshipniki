@@ -431,6 +431,7 @@
     </div>
 </div>
 
+<script src="enrich-data.js"></script>
 <script>
 const T1="Шариковый радиальный",T2="Роликовый конический",T3="Упорный шариковый",T4="Роликовый цилиндрический",T5="Шариковый радиальный";
 const bore=c=>c<4?[10,12,15,17][c]:c*5;
@@ -519,11 +520,16 @@ let currentModalItem = null;
 let extra = {};  // данные, дополненные ИИ для уже существующих подшипников (масса, C, C0, обороты)
 try { extra = JSON.parse(localStorage.getItem('bearing_extra') || '{}'); } catch(e) {}
 function getFullDB() {
+    const ENR = window.ENRICH || {};   // пакетно дополненные данные (файл enrich-data.js)
     return [...staticBearingDB, ...customDB].map(b => {
-        const e = extra[b.iso];
-        if(!e) return b;
-        const o = { ...b, aiExtra: true };
-        ['weight', 'C', 'C0', 'speed'].forEach(k => { if(!o[k] && e[k]) o[k] = e[k]; });
+        const e = extra[b.iso], f = ENR[b.iso];
+        if(!e && !f) return b;
+        const o = { ...b };
+        ['weight', 'C', 'C0', 'speed'].forEach(k => {
+            if(o[k]) return;
+            const v = (e && e[k]) || (f && f[k]);
+            if(v) { o[k] = v; o.aiExtra = true; }
+        });
         return o;
     });
 }
