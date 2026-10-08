@@ -381,6 +381,11 @@
                 </div>
             </div>
         </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0">
+            <button class="btn btn-ds" onclick="applyFilter(true)">🔍 Подобрать</button>
+            <button class="btn btn-outline" onclick="resetFilter()">Сбросить</button>
+        </div>
+        <div style="color:var(--text-muted);margin-bottom:10px">Одно число в «от» = точный размер. Два числа = диапазон от–до.</div>
         <div id="filter-results" class="cards-grid"></div>
     </div>
 
@@ -620,24 +625,39 @@ function renderFavorites() {
     renderCards(favorites, document.getElementById('fav-results'));
 }
 
-function applyFilter() {
+function filterRange(minId, maxId) {
+    const a = parseFloat(document.getElementById(minId).value), b = parseFloat(document.getElementById(maxId).value);
+    if(!isNaN(a) && isNaN(b)) return [a - 0.01, a + 0.01];   // одно число = точный размер
+    return [isNaN(a) ? 0 : a, isNaN(b) ? Infinity : b];
+}
+function applyFilter(scroll) {
     const type = document.getElementById('filter-type').value;
-    const dMin = parseFloat(document.getElementById('filter-d-min').value) || 0;
-    const dMax = parseFloat(document.getElementById('filter-d-max').value) || Infinity;
-    const DMin = parseFloat(document.getElementById('filter-D-min').value) || 0;
-    const DMax = parseFloat(document.getElementById('filter-D-max').value) || Infinity;
-    const BMin = parseFloat(document.getElementById('filter-B-min').value) || 0;
-    const BMax = parseFloat(document.getElementById('filter-B-max').value) || Infinity;
-
+    const [dMin, dMax] = filterRange('filter-d-min', 'filter-d-max');
+    const [DMin, DMax] = filterRange('filter-D-min', 'filter-D-max');
+    const [BMin, BMax] = filterRange('filter-B-min', 'filter-B-max');
     const filtered = getFullDB().filter(b => {
         if(type && b.type !== type) return false;
-        if(b.d < dMin || b.d > dMax) return false;
-        if(b.D < DMin || b.D > DMax) return false;
-        if(b.B < BMin || b.B > BMax) return false;
-        return true;
+        return b.d >= dMin && b.d <= dMax && b.D >= DMin && b.D <= DMax && b.B >= BMin && b.B <= BMax;
     });
-
-    renderCards(filtered, document.getElementById('filter-results'));
+    const box = document.getElementById('filter-results');
+    if(!filtered.length) {
+        box.innerHTML = '<div style="grid-column:1/-1;padding:20px;background:var(--card-bg);border-radius:12px;border:1px dashed var(--deepseek-color)"><p style="margin-bottom:10px">По этим размерам в базе ничего нет. Попробуйте диапазон («от» и «до») или спросите ИИ.</p><button class="btn btn-ds" onclick="askAIBySize()">🤖 Спросить ИИ</button></div>';
+    } else {
+        renderCards(filtered, box);
+        box.insertAdjacentHTML('afterbegin', '<div style="grid-column:1/-1;font-weight:bold">Найдено: ' + filtered.length + '</div>');
+    }
+    if(scroll === true) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function resetFilter() {
+    ['filter-d-min','filter-d-max','filter-D-min','filter-D-max','filter-B-min','filter-B-max'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('filter-type').value = '';
+    applyFilter();
+}
+function askAIBySize() {
+    const v = id => document.getElementById(id).value.trim();
+    const parts = [['d', 'filter-d-min'], ['D', 'filter-D-min'], ['B', 'filter-B-min']].filter(x => v(x[1])).map(x => x[0] + '=' + v(x[1]) + ' мм');
+    document.getElementById('ai-prompt').value = 'Какой подшипник подходит по размерам: ' + (parts.join(', ') || 'не указаны') + '? Тип: ' + (document.getElementById('filter-type').value || 'любой') + '.';
+    switchTab('ai'); askAI();
 }
 
 function openModal(iso) {
