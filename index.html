@@ -672,7 +672,7 @@ function copyCardData() {
     navigator.clipboard.writeText(text).then(() => alert('Скопировано!'));
 }
 
-const AI_URL = "";  // адрес вашего Cloudflare Worker (один раз, см. README)
+const AI_URL = "https://podshipniki-ai.wlad88881.workers.dev";  // адрес вашего Cloudflare Worker (один раз, см. README)
 async function askAI() {
     const prompt = document.getElementById('ai-prompt').value.trim();
     if(!prompt) return;
