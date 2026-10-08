@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подшипники</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+            --deepseek-color: #6366f1;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --warning: #f59e0b;
+            --success: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 30px;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .db-badge {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .api-key-box {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .api-key-box input {
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            width: 220px;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+
+        .tab-btn.ds-tab.active {
+            background: var(--deepseek-color);
+            color: #fff;
+            border-color: var(--deepseek-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="password"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .range-inputs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-ds {
+            background: var(--deepseek-color);
+            color: #fff;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .card-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .fav-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.3rem;
+        }
+
+        .fav-btn.active {
+            color: var(--warning);
+        }
+
+        .params-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+
+        .param-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .param-label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .param-value {
+            font-weight: 600;
+        }
+
+        .tag-saved {
+            font-size: 0.7rem;
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--deepseek-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            margin-left: 6px;
+        }
+
+        .ai-response {
+            background: var(--card-bg);
+            border: 1px solid var(--deepseek-color);
+            padding: 20px;
+            border-radius: 12px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+            padding: 20px;
+        }
+    </style>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0f172a"><link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" href="icon-192.png">
+<style>body{font-size:18px}.btn{padding:14px 22px}input[type="text"]{font-size:18px}</style>
+</head>
+<body>
+
+<header>
+    <div class="header-container">
+        <h1>⚙️ ПодшипникИнфо <span class="db-badge" id="db-counter">База: 0</span></h1>
+        <button id="install-btn" class="btn btn-ds" style="display:none" onclick="installApp()">📲 Установить</button>
+    </div>
+</header>
+
+<div class="container">
+    <div id="ios-hint" style="display:none;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px">📲 Чтобы установить на iPhone: нажмите «Поделиться» (квадрат со стрелкой) → «На экран Домой».</div>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('search')">🔍 Офлайн Поиск</button>
+        <button class="tab-btn" onclick="switchTab('filter')">📐 Подбор по размерам</button>
+        <button class="tab-btn ds-tab" onclick="switchTab('ai')">🤖 ИИ-помощник</button>
+        <button class="tab-btn" onclick="switchTab('fav')">⭐ Избранное (<span id="fav-count">0</span>)</button>
+    </div>
+
+    <!-- Таб 1: Поиск -->
+    <div id="tab-search" class="tab-content active">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Введите номер (204, 6204, 305, 7206, NU204, 3620)..." oninput="handleSearch()">
+            <button class="btn btn-ds" style="margin-top:8px;width:100%" onclick="searchViaAI(document.getElementById('search-input').value.trim())">🤖 Найти с ИИ и сохранить в базу</button>
+        </div>
+        <div id="search-results" class="cards-grid"></div>
+    </div>
+
+    <!-- Таб 2: Подбор по размерам -->
+    <div id="tab-filter" class="tab-content">
+        <div class="filter-grid">
+            <div class="filter-group">
+                <label>Тип подшипника</label>
+                <select id="filter-type" onchange="applyFilter()">
+                    <option value="">Все типы</option>
+                    <option value="Шариковый радиальный">Шариковый радиальный</option>
+                    <option value="Роликовый конический">Роликовый конический</option>
+                    <option value="Роликовый цилиндрический">Роликовый цилиндрический</option>
+                    <option value="Упорный шариковый">Упорный шариковый</option>
+                    <option value="Сферический двухрядный">Сферический двухрядный</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>d (Внутренний диаметр, мм)</label>
+                <div class="range-inputs">
+                    <input type="number" id="filter-d-min" placeholder="от" oninput="applyFilter()">
+                    <input type="number" id="filter-d-max" placeholder="до" oninput="applyFilter()">
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>D (Наружный диаметр, мм)</label>
+                <div class="range-inputs">
+                    <input type="number" id="filter-D-min" placeholder="от" oninput="applyFilter()">
+                    <input type="number" id="filter-D-max" placeholder="до" oninput="applyFilter()">
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>B/T (Ширина, мм)</label>
+                <div class="range-inputs">
+                    <input type="number" id="filter-B-min" placeholder="от" oninput="applyFilter()">
+                    <input type="number" id="filter-B-max" placeholder="до" oninput="applyFilter()">
+                </div>
+            </div>
+        </div>
+        <div id="filter-results" class="cards-grid"></div>
+    </div>
+
+    <!-- Таб 3: ИИ AI -->
+    <div id="tab-ai" class="tab-content">
+        <div style="background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+            <h3>Спросить ИИ</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 8px 0 15px 0;">
+                Найденный подшипник <b>автоматически сохранится в вашу офлайн-базу</b> со всеми размерами и характеристиками.
+            </p>
+            <textarea id="ai-prompt" rows="3" placeholder="Например: Найди характеристики и размеры подшипника 3620 по ГОСТ и его аналога ISO..."></textarea>
+            <div style="margin-top: 10px; display: flex; gap: 10px;">
+                <button class="btn btn-ds" onclick="askAI()">Запросить и сохранить в базу</button>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-outline" onclick="exportDB()">⬇ Экспорт базы</button><button class="btn btn-outline" onclick="importDB()">⬆ Импорт</button></div>
+            <div id="ai-output-container" style="margin-top: 20px; display: none;">
+                <div class="ai-response" id="ai-output"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таб 4: Избранное -->
+    <div id="tab-fav" class="tab-content">
+        <div id="fav-results" class="cards-grid"></div>
+    </div>
+</div>
+
+<!-- Модальное окно -->
+<div class="modal" id="modal-detail">
+    <div class="modal-content">
+        <div class="card-header">
+            <div>
+                <div class="card-title" id="modal-title"></div>
+                <div class="card-subtitle" id="modal-subtitle"></div>
+            </div>
+            <button class="btn-outline" style="padding: 4px 8px;" onclick="closeModal()">✕</button>
+        </div>
+        <div id="modal-body"></div>
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <button class="btn btn-outline" style="flex: 1;" onclick="copyCardData()">📋 Скопировать</button>
+            <button class="btn btn-ds" style="flex: 1; font-size: 0.85rem;" onclick="consultModalAI()">🤖 Запросить ИИ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const T1="Шариковый радиальный",T2="Роликовый конический",T3="Упорный шариковый",T4="Роликовый цилиндрический",T5="Шариковый радиальный";
+const bore=c=>c<4?[10,12,15,17][c]:c*5;
+const DB=[];
+const p2=c=>String(c).padStart(2,"0");
+// A(тип, серия, префикс номера, первый код отверстия, [[D,B]...], функция ГОСТ|null)
+function A(t,ser,pre,c0,rows,gf){rows.forEach((r,i)=>{const c=c0+i;DB.push({n:pre+p2(c),d:bore(c),D:r[0],B:r[1],t,ser,g:gf?String(gf(c)):""})})}
+A(T1,"Сверхлёгкая узкая (618xx)","618",0,[[19,5],[21,5],[24,5],[26,5],[32,7],[37,7],[42,7],[47,7],[52,7],[58,7],[65,7],[72,9],[78,10],[85,10],[90,10],[95,10],[100,10]]);
+A(T1,"Особо лёгкая (619xx)","619",0,[[22,6],[24,6],[28,7],[30,7],[37,9],[42,9],[47,9],[55,10],[62,12],[68,12],[72,12],[80,13],[85,13],[90,13],[100,16],[105,16],[110,16],[120,18],[125,18],[130,18],[140,20]]);
+A(T1,"Особо лёгкая узкая (160xx)","160",2,[[32,8],[35,8],[42,8],[47,8],[55,9],[62,9],[68,9],[75,10],[80,10]]);
+A(T1,"Особо лёгкая (60xx)","60",0,[[26,8],[28,8],[32,9],[35,10],[42,12],[47,12],[55,13],[62,14],[68,15],[75,16],[80,16],[90,18],[95,18],[100,18],[110,20],[115,20],[125,22],[130,22],[140,24],[145,24],[150,24]],c=>1000900+c);
+A(T1,"Лёгкая (62xx)","62",0,[[30,9],[32,10],[35,11],[40,12],[47,14],[52,15],[62,16],[72,17],[80,18],[85,19],[90,20],[100,21],[110,22],[120,23],[125,24],[130,25],[140,26],[150,28],[160,30],[170,32],[180,34]],c=>200+c);
+A(T1,"Средняя (63xx)","63",0,[[35,11],[37,12],[42,13],[47,14],[52,15],[62,17],[72,19],[80,21],[90,23],[100,25],[110,27],[120,29],[130,31],[140,33],[150,35],[160,37],[170,39]],c=>300+c);
+A(T1,"Тяжёлая (64xx)","64",3,[[62,17],[72,19],[80,21],[90,23],[100,25],[110,27],[120,29],[130,31],[140,33],[150,35],[160,37],[180,42]],c=>400+c);
+A(T2,"Лёгкая (302xx)","302",4,[[47,15.25],[52,16.25],[62,17.25],[72,18.25],[80,19.75],[85,20.75],[90,21.75],[100,22.75],[110,23.75],[120,24.75],[125,26.25]],c=>7200+c);
+A(T2,"Средняя (303xx)","303",5,[[62,18.25],[72,20.75],[80,22.75],[90,25.25],[100,27.25],[110,29.25]],c=>7300+c);
+A(T3,"Лёгкая (511xx)","511",0,[[24,9],[26,9],[28,9],[30,9],[35,10],[42,11],[47,11],[52,12],[60,13],[65,14],[70,14]],c=>8100+c);
+A(T3,"Средняя (512xx)","512",0,[[26,11],[28,11],[32,12],[35,12],[40,14],[47,15],[52,16],[62,18],[68,19],[73,20],[78,22]],c=>8200+c);
+A(T4,"Лёгкая (NU2xx)","NU2",4,[[47,14],[52,15],[62,16],[72,17],[80,18],[85,19],[90,20]],c=>32200+c);
+A(T4,"Средняя (NU3xx)","NU3",5,[[62,17],[72,19],[80,21],[90,23],[100,25],[110,27]],c=>32300+c);
+[["604",4,12,4,1000094],["605",5,14,5,1000095],["606",6,17,6,1000096],["607",7,19,6,1000097],["608",8,22,7,1000098],["609",9,24,7,1000099],["623",3,10,4],["624",4,13,5],["625",5,16,5],["626",6,19,6],["627",7,22,7],["628",8,24,8],["629",9,26,8]]
+ .forEach(x=>DB.push({n:x[0],d:x[1],D:x[2],B:x[3],t:T5,ser:"Миниатюрный",g:x[4]?String(x[4]):""}));
+
+const SUF={"2RS":"Два контактных резиновых уплотнения","2RSR":"Два контактных резиновых уплотнения","2RS1":"Два контактных резиновых уплотнения","RS":"Одно резиновое уплотнение","RSR":"Одно резиновое уплотнение","2Z":"Две металлические защитные шайбы","ZZ":"Две металлические защитные шайбы","Z":"Одна защитная шайба","2RZ":"Два бесконтактных уплотнения","N":"Канавка под стопорное кольцо","NR":"Канавка и стопорное кольцо","C2":"Зазор меньше нормального","C0":"Нормальный зазор","C3":"Зазор больше нормального","C4":"Зазор значительно больше нормального","C5":"Зазор максимально увеличенный","P6":"Класс точности P6","P5":"Класс точности P5","P4":"Класс точности P4","P0":"Нормальный класс точности","K":"Конусное отверстие 1:12","M":"Латунный сепаратор","J":"Стальной штампованный сепаратор","TN9":"Полиамидный сепаратор","A":"Улучшенное исполнение (ГОСТ)"};
+Object.assign(SUF,{AC:"Угол контакта 25–26°",B:"Угол контакта 40°",C:"Угол контакта 15°",E:"Усиленная конструкция",CC:"Улучшенная внутренняя конструкция",W33:"Смазочная канавка и отверстия в наружном кольце",MB:"Латунный сепаратор",CA:"Латунный сепаратор",MA:"Латунный сепаратор",TVP:"Полиамидный сепаратор",TVPB:"Полиамидный сепаратор"});
+const T6="Шариковый радиально-упорный",T7="Сферический роликовый двухрядный",T8="Шариковый сферический двухрядный";
+function R(t,ser,pre,rows,gf){rows.forEach(r=>DB.push({n:pre+p2(r[0]),d:bore(r[0]),D:r[1],B:r[2],t,ser,g:gf?String(gf(r[0])):""}))}
+R(T1,"Особо лёгкая (60xx)","60",[[21,160,26],[22,170,28],[24,180,28],[26,200,33],[28,210,33],[30,225,35],[32,240,38]],c=>1000900+c);
+R(T1,"Лёгкая (62xx)","62",[[21,190,36],[22,200,38],[24,215,40],[26,230,40],[28,250,42],[30,270,45],[32,290,48],[34,310,52],[36,320,52],[38,340,55],[40,360,58]],c=>200+c);
+R(T1,"Средняя (63xx)","63",[[17,180,41],[18,190,43],[19,200,45],[20,215,47],[21,225,49],[22,240,50],[24,260,55],[26,280,58],[28,300,62],[30,320,65],[32,340,68],[34,360,72],[36,380,75]],c=>300+c);
+R(T7,"Лёгкая широкая (222xx)","222",[[5,52,18],[6,62,20],[7,72,23],[8,80,23],[9,85,23],[10,90,23],[11,100,25],[12,110,28],[13,120,31],[14,125,31],[15,130,31],[16,140,33],[17,150,36],[18,160,40],[19,170,43],[20,180,46],[22,200,53],[24,215,58],[26,230,64],[28,250,68],[30,270,73],[32,290,80],[34,310,86],[36,320,86],[38,340,92],[40,360,98]],c=>3500+c);
+R(T7,"Средняя (223xx)","223",[[8,90,33],[9,100,36],[10,110,40],[11,120,43],[12,130,46],[13,140,48],[14,150,51],[15,160,55],[16,170,58],[17,180,60],[18,190,64],[19,200,67],[20,215,73],[22,240,80],[24,260,86],[26,280,93],[28,300,102],[30,320,108]],c=>3600+c);
+R(T8,"Лёгкая (12xx)","12",[[4,47,14],[5,52,15],[6,62,16],[7,72,17],[8,80,18],[9,85,19],[10,90,20],[11,100,21],[12,110,22]],c=>1200+c);
+R(T8,"Средняя (13xx)","13",[[5,62,17],[6,72,19],[7,80,21],[8,90,23],[9,100,25],[10,110,27]],c=>1300+c);
+R(T2,"Лёгкая (302xx)","302",[[15,130,27.25],[16,140,28.25],[17,150,30.5],[18,160,32.5],[19,170,34.5],[20,180,37]],c=>7200+c);
+R(T2,"Средняя (303xx)","303",[[11,120,31.5],[12,130,33.5],[13,140,36],[14,150,38],[15,160,40],[16,170,42.5]],c=>7300+c);
+R(T2,"Повышенной грузоподъёмности (322xx)","322",[[4,47,19.25],[5,52,19.25],[6,62,21.25],[7,72,24.75],[8,80,24.75],[9,85,24.75],[10,90,24.75],[11,100,26.75],[12,110,29.75]],c=>7500+c);
+R(T3,"Тяжёлая (513xx)","513",[[5,52,18],[6,60,21],[7,68,24],[8,78,26],[9,85,28],[10,95,31]],c=>8300+c);
+R(T4,"Лёгкая (NU2xx)","NU2",[[11,100,21],[12,110,22],[13,120,23],[14,125,24],[15,130,25],[16,140,26]],c=>32200+c);
+R(T4,"Средняя (NU3xx)","NU3",[[11,120,29],[12,130,31],[13,140,33],[14,150,35]],c=>32300+c);
+[["N",-30000],["NJ",10000],["NF",-20000]].forEach(v=>DB.filter(b=>/^NU[23]/.test(b.n)).forEach(b=>DB.push({...b,n:v[0]+b.n.slice(2),ser:b.ser.replace("NU",v[0]),g:String(+b.g+v[1])})));
+// радиально-упорные 72xx / 73xx на базе размеров 62xx / 63xx
+[["62","72",36200,46200],["63","73",36300,46300]].forEach(a=>DB.filter(b=>b.n.startsWith(a[0])&&b.n.length==4&&+b.n.slice(2)>=4&&+b.n.slice(2)<=40).forEach(b=>{const c=+b.n.slice(2);DB.push({n:a[1]+b.n.slice(2),d:b.d,D:b.D,B:b.B,t:T6,ser:"Радиально-упорный ("+a[1]+"xx)",g:"",xs:[String(a[2]+c),String(a[3]+c)],gx:(a[2]+c)+" (C, 15°), "+(a[3]+c)+" (AC, 26°)"})}));
+
+// Исправленные номера ГОСТ (сверены по выгрузке SAP) и миниатюрные 69x
+DB.forEach(b=>{const c=+b.n.slice(-2);
+ if(/^618\d\d$/.test(b.n))b.g=String(1000800+c);
+ else if(/^619\d\d$/.test(b.n))b.g=String(1000900+c);
+ else if(/^160\d\d$/.test(b.n))b.g=String(7000100+c);
+ else if(/^60\d\d$/.test(b.n))b.g=String(100+c);
+ else if(/^60[4-9]$/.test(b.n))b.g=String(+b.n.slice(2)+10)});
+[[693,3,8,3],[694,4,11,4],[695,5,13,4],[696,6,15,5],[697,7,17,5],[698,8,19,6],[699,9,20,6]].forEach(a=>DB.push({n:String(a[0]),d:a[1],D:a[2],B:a[3],t:T1,ser:"Миниатюрный",g:String(1000090+a[0]-690)}));
+// Образцы с полными данными (масса, C, C0)
+const richDB = [
+    { gost: "100", iso: "6000", d: 10, D: 26, B: 8, weight: 0.019, C: 4.55, C0: 1.96, speed: 28000, type: "Шариковый радиальный" },
+    { gost: "101", iso: "6001", d: 12, D: 28, B: 8, weight: 0.022, C: 5.10, C0: 2.36, speed: 24000, type: "Шариковый радиальный" },
+    { gost: "102", iso: "6002", d: 15, D: 32, B: 9, weight: 0.030, C: 5.60, C0: 2.83, speed: 20000, type: "Шариковый радиальный" },
+    { gost: "103", iso: "6003", d: 17, D: 35, B: 10, weight: 0.039, C: 6.00, C0: 3.25, speed: 18000, type: "Шариковый радиальный" },
+    { gost: "104", iso: "6004", d: 20, D: 42, B: 12, weight: 0.069, C: 9.40, C0: 5.00, speed: 16000, type: "Шариковый радиальный" },
+    { gost: "105", iso: "6005", d: 25, D: 47, B: 12, weight: 0.080, C: 10.1, C0: 5.85, speed: 13000, type: "Шариковый радиальный" },
+    { gost: "200", iso: "6200", d: 10, D: 30, B: 9, weight: 0.032, C: 5.10, C0: 2.39, speed: 24000, type: "Шариковый радиальный" },
+    { gost: "201", iso: "6201", d: 12, D: 32, B: 10, weight: 0.037, C: 6.80, C0: 3.05, speed: 22000, type: "Шариковый радиальный" },
+    { gost: "202", iso: "6202", d: 15, D: 35, B: 11, weight: 0.045, C: 7.80, C0: 3.75, speed: 19000, type: "Шариковый радиальный" },
+    { gost: "203", iso: "6203", d: 17, D: 40, B: 12, weight: 0.065, C: 9.56, C0: 4.75, speed: 17000, type: "Шариковый радиальный" },
+    { gost: "204", iso: "6204", d: 20, D: 47, B: 14, weight: 0.106, C: 12.8, C0: 6.65, speed: 15000, type: "Шариковый радиальный" },
+    { gost: "205", iso: "6205", d: 25, D: 52, B: 15, weight: 0.128, C: 14.0, C0: 7.88, speed: 13000, type: "Шариковый радиальный" },
+    { gost: "206", iso: "6206", d: 30, D: 62, B: 16, weight: 0.200, C: 19.5, C0: 11.2, speed: 11000, type: "Шариковый радиальный" },
+    { gost: "207", iso: "6207", d: 35, D: 72, B: 17, weight: 0.288, C: 25.7, C0: 15.3, speed: 9800, type: "Шариковый радиальный" },
+    { gost: "208", iso: "6208", d: 40, D: 80, B: 18, weight: 0.366, C: 29.1, C0: 17.8, speed: 8700, type: "Шариковый радиальный" },
+    { gost: "209", iso: "6209", d: 45, D: 85, B: 19, weight: 0.407, C: 32.5, C0: 20.4, speed: 8000, type: "Шариковый радиальный" },
+    { gost: "210", iso: "6210", d: 50, D: 90, B: 20, weight: 0.460, C: 35.1, C0: 23.2, speed: 7300, type: "Шариковый радиальный" },
+    { gost: "304", iso: "6304", d: 20, D: 52, B: 15, weight: 0.144, C: 15.9, C0: 7.80, speed: 13000, type: "Шариковый радиальный" },
+    { gost: "305", iso: "6305", d: 25, D: 62, B: 17, weight: 0.232, C: 22.5, C0: 11.6, speed: 11000, type: "Шариковый радиальный" },
+    { gost: "306", iso: "6306", d: 30, D: 72, B: 19, weight: 0.345, C: 28.1, C0: 16.0, speed: 9200, type: "Шариковый радиальный" },
+    { gost: "7206", iso: "30206", d: 30, D: 62, B: 17.25, weight: 0.230, C: 35.2, C0: 38.0, speed: 6700, type: "Роликовый конический" }
+];
+const gostOf=b=>b.xs?b.xs.join(" / "):b.g;
+const sapDB=[{"iso":"6-27709К1У","gost":"","d":45.0,"D":100.0,"B":31.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32218","gost":"","d":90.0,"D":160.0,"B":30.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30310","gost":"","d":50.0,"D":110.0,"B":29.5,"type":"Роликовый конический","sap":1},{"iso":"NN3012K","gost":"3182112","d":60.0,"D":95.0,"B":26.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"7212","gost":"46212Л","d":60.0,"D":110.0,"B":22.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"7234","gost":"46234","d":170.0,"D":310.0,"B":52.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"23228CCW33","gost":"","d":140.0,"D":250.0,"B":88.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"Н0-92317ЕМ","gost":"","d":85.0,"D":180.0,"B":41.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23056CCW33","gost":"","d":280.0,"D":420.0,"B":106.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23044CCKW33+OH3044H","gost":"","d":200.0,"D":340.0,"B":90.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3548","gost":"","d":240.0,"D":440.0,"B":120.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NF310","gost":"12310КМ","d":50.0,"D":110.0,"B":27.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"5-8124","gost":"","d":120.0,"D":155.0,"B":25.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"51112","gost":"","d":60.0,"D":85.0,"B":17.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"30207","gost":"","d":35.0,"D":72.0,"B":17.0,"type":"Роликовый конический","sap":1},{"iso":"32009","gost":"","d":45.0,"D":75.0,"B":19.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6007","gost":"","d":35.0,"D":62.0,"B":14.0,"type":"Шариковый радиальный","sap":1},{"iso":"32326М","gost":"","d":130.0,"D":280.0,"B":58.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30205J2Q","gost":"","d":25.0,"D":52.0,"B":16.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22224EC3","gost":"","d":120.0,"D":215.0,"B":58.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30-3612АМНК5","gost":"","d":60.0,"D":130.0,"B":46.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32326","gost":"","d":130.0,"D":280.0,"B":58.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2316Л","gost":"","d":80.0,"D":170.0,"B":39.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7530","gost":"","d":150.0,"D":270.0,"B":77.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"1211","gost":"","d":55.0,"D":100.0,"B":21.0,"type":"Шариковый сферический двухрядный","sap":1},{"iso":"32330","gost":"","d":150.0,"D":320.0,"B":65.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6011","gost":"111","d":55.0,"D":90.0,"B":18.0,"type":"Шариковый радиальный","sap":1},{"iso":"30311","gost":"7311","d":55.0,"D":120.0,"B":31.5,"type":"Роликовый конический","sap":1},{"iso":"16007","gost":"7000107","d":35.0,"D":62.0,"B":9.0,"type":"Шариковый радиальный","sap":1},{"iso":"6208","gost":"208","d":40.0,"D":80.0,"B":18.0,"type":"Шариковый радиальный","sap":1},{"iso":"6220","gost":"220","d":100.0,"D":180.0,"B":34.0,"type":"Шариковый радиальный","sap":1},{"iso":"6013","gost":"113","d":65.0,"D":100.0,"B":18.0,"type":"Шариковый радиальный","sap":1},{"iso":"6226","gost":"226","d":130.0,"D":230.0,"B":40.0,"type":"Шариковый радиальный","sap":1},{"iso":"264706","gost":"","d":30.0,"D":44.0,"B":33.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7514","gost":"","d":70.0,"D":125.0,"B":33.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32544","gost":"","d":220.0,"D":400.0,"B":108.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3556","gost":"","d":280.0,"D":500.0,"B":130.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3003264","gost":"","d":320.0,"D":580.0,"B":208.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2622134","gost":"","d":192.0,"D":260.0,"B":54.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32219","gost":"","d":95.0,"D":170.0,"B":32.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6003","gost":"103","d":17.0,"D":35.0,"B":10.0,"type":"Шариковый радиальный","sap":1},{"iso":"32211","gost":"7511","d":55.0,"D":100.0,"B":26.75,"type":"Роликовый конический","sap":1},{"iso":"180314","gost":"","d":70.0,"D":150.0,"B":35.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180312","gost":"","d":60.0,"D":130.0,"B":31.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"3004752","gost":"","d":260.0,"D":440.0,"B":144.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22318","gost":"3618","d":90.0,"D":190.0,"B":64.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"23028","gost":"3003128","d":140.0,"D":210.0,"B":53.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"22222","gost":"3522","d":110.0,"D":200.0,"B":53.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"53518","gost":"","d":90.0,"D":160.0,"B":40.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N313","gost":"2313","d":65.0,"D":140.0,"B":33.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"6206","gost":"206","d":30.0,"D":62.0,"B":16.0,"type":"Шариковый радиальный","sap":1},{"iso":"6314","gost":"314","d":70.0,"D":150.0,"B":35.0,"type":"Шариковый радиальный","sap":1},{"iso":"22336","gost":"","d":180.0,"D":380.0,"B":126.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6207","gost":"","d":35.0,"D":72.0,"B":17.0,"type":"Шариковый радиальный","sap":1},{"iso":"22314","gost":"","d":70.0,"D":150.0,"B":51.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"3544","gost":"","d":220.0,"D":400.0,"B":108.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2317","gost":"","d":85.0,"D":180.0,"B":41.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30314","gost":"7314","d":70.0,"D":150.0,"B":38.0,"type":"Роликовый конический","sap":1},{"iso":"180200","gost":"","d":10.0,"D":30.0,"B":9.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"42616","gost":"","d":80.0,"D":170.0,"B":58.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30306","gost":"7306","d":30.0,"D":72.0,"B":20.75,"type":"Роликовый конический","sap":1},{"iso":"7312","gost":"46312","d":60.0,"D":130.0,"B":31.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"22328","gost":"3628","d":140.0,"D":300.0,"B":102.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"42224","gost":"","d":120.0,"D":215.0,"B":40.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2324","gost":"","d":120.0,"D":260.0,"B":55.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"1616","gost":"","d":80.0,"D":170.0,"B":58.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7634","gost":"","d":170.0,"D":360.0,"B":127.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N314","gost":"2314","d":70.0,"D":150.0,"B":35.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"6309","gost":"309","d":45.0,"D":100.0,"B":25.0,"type":"Шариковый радиальный","sap":1},{"iso":"24030","gost":"","d":150.0,"D":225.0,"B":75.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"60200","gost":"","d":10.0,"D":30.0,"B":9.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"30309","gost":"7309","d":45.0,"D":100.0,"B":27.5,"type":"Роликовый конический","sap":1},{"iso":"7524","gost":"","d":120.0,"D":215.0,"B":61.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2320","gost":"","d":100.0,"D":215.0,"B":47.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6409","gost":"409","d":45.0,"D":120.0,"B":29.0,"type":"Шариковый радиальный","sap":1},{"iso":"6-7309","gost":"","d":45.0,"D":100.0,"B":27.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"402715","gost":"","d":75.0,"D":160.0,"B":45.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6322","gost":"322","d":110.0,"D":240.0,"B":50.0,"type":"Шариковый радиальный","sap":1},{"iso":"30312","gost":"7312","d":60.0,"D":130.0,"B":33.5,"type":"Роликовый конический","sap":1},{"iso":"N310","gost":"2310","d":50.0,"D":110.0,"B":27.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"22324","gost":"3624","d":120.0,"D":260.0,"B":86.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"22226","gost":"3526","d":130.0,"D":230.0,"B":64.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"32417","gost":"","d":85.0,"D":210.0,"B":52.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7518","gost":"","d":90.0,"D":160.0,"B":42.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22208","gost":"3508","d":40.0,"D":80.0,"B":23.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"6026","gost":"126","d":130.0,"D":200.0,"B":33.0,"type":"Шариковый радиальный","sap":1},{"iso":"7309","gost":"46309","d":45.0,"D":100.0,"B":25.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"7614","gost":"","d":70.0,"D":150.0,"B":54.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"80314","gost":"","d":70.0,"D":150.0,"B":35.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6301","gost":"301","d":12.0,"D":37.0,"B":12.0,"type":"Шариковый радиальный","sap":1},{"iso":"32322","gost":"","d":110.0,"D":240.0,"B":50.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32315К1М","gost":"","d":75.0,"D":160.0,"B":37.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"60305","gost":"","d":25.0,"D":62.0,"B":17.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32634","gost":"","d":170.0,"D":360.0,"B":120.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"60207","gost":"","d":35.0,"D":72.0,"B":17.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"80205","gost":"","d":25.0,"D":52.0,"B":15.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"30310 (50×110)","gost":"7310","d":50.0,"D":110.0,"B":29.25,"type":"Роликовый конический","sap":1},{"iso":"6001","gost":"101","d":12.0,"D":28.0,"B":8.0,"type":"Шариковый радиальный","sap":1},{"iso":"32316","gost":"","d":80.0,"D":170.0,"B":39.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32244","gost":"","d":220.0,"D":400.0,"B":65.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180606","gost":"","d":30.0,"D":72.0,"B":27.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"23244MB","gost":"","d":220.0,"D":400.0,"B":144.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NJ309","gost":"42309","d":45.0,"D":100.0,"B":25.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"180302","gost":"","d":15.0,"D":42.0,"B":13.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180605","gost":"","d":25.0,"D":62.0,"B":24.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6202","gost":"202","d":15.0,"D":35.0,"B":11.0,"type":"Шариковый радиальный","sap":1},{"iso":"402411","gost":"","d":55.0,"D":140.0,"B":33.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6211","gost":"211","d":55.0,"D":100.0,"B":21.0,"type":"Шариковый радиальный","sap":1},{"iso":"6214","gost":"214","d":70.0,"D":125.0,"B":24.0,"type":"Шариковый радиальный","sap":1},{"iso":"180604","gost":"","d":20.0,"D":52.0,"B":21.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6216","gost":"216","d":80.0,"D":140.0,"B":26.0,"type":"Шариковый радиальный","sap":1},{"iso":"170412Л","gost":"","d":60.0,"D":150.0,"B":35.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"50412","gost":"","d":60.0,"D":150.0,"B":35.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"2316","gost":"","d":80.0,"D":170.0,"B":39.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N309","gost":"2309","d":45.0,"D":100.0,"B":25.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"N311","gost":"2311","d":55.0,"D":120.0,"B":29.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"42624","gost":"","d":120.0,"D":260.0,"B":86.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2319","gost":"","d":95.0,"D":200.0,"B":45.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22310","gost":"3610","d":50.0,"D":110.0,"B":40.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"23056","gost":"3003156","d":280.0,"D":420.0,"B":106.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"6307","gost":"307","d":35.0,"D":80.0,"B":21.0,"type":"Шариковый радиальный","sap":1},{"iso":"32318","gost":"","d":90.0,"D":190.0,"B":43.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3313","gost":"3086313","d":65.0,"D":140.0,"B":58.7,"type":"Радиально-упорный шариковый","sap":1},{"iso":"6310","gost":"310","d":50.0,"D":110.0,"B":27.0,"type":"Шариковый радиальный","sap":1},{"iso":"6316","gost":"316","d":80.0,"D":170.0,"B":39.0,"type":"Шариковый радиальный","sap":1},{"iso":"6317","gost":"317","d":85.0,"D":180.0,"B":41.0,"type":"Шариковый радиальный","sap":1},{"iso":"NN3015K","gost":"3182115","d":75.0,"D":115.0,"B":30.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"6319","gost":"319","d":95.0,"D":200.0,"B":45.0,"type":"Шариковый радиальный","sap":1},{"iso":"6320","gost":"320","d":100.0,"D":215.0,"B":47.0,"type":"Шариковый радиальный","sap":1},{"iso":"NJ305","gost":"42305","d":25.0,"D":62.0,"B":17.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"6203-2RSH","gost":"","d":17.0,"D":40.0,"B":12.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6204-2RSH","gost":"","d":20.0,"D":47.0,"B":14.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6205-2RSH","gost":"","d":25.0,"D":52.0,"B":15.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6206-2RS1","gost":"","d":30.0,"D":62.0,"B":16.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7624","gost":"","d":120.0,"D":260.0,"B":90.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6330","gost":"330","d":150.0,"D":320.0,"B":65.0,"type":"Шариковый радиальный","sap":1},{"iso":"6207-2RS1","gost":"","d":35.0,"D":72.0,"B":17.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22230","gost":"3530","d":150.0,"D":270.0,"B":73.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"804807","gost":"","d":33.635,"D":50.0,"B":31.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22236","gost":"3536","d":180.0,"D":320.0,"B":86.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"22238","gost":"3538","d":190.0,"D":340.0,"B":92.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"22240","gost":"3540","d":200.0,"D":360.0,"B":98.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"6305","gost":"305","d":25.0,"D":62.0,"B":17.0,"type":"Шариковый радиальный","sap":1},{"iso":"6208-2RS1","gost":"","d":40.0,"D":80.0,"B":18.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6305-2RS1","gost":"","d":25.0,"D":62.0,"B":17.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6306-2RS1","gost":"","d":30.0,"D":72.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"3652","gost":"","d":260.0,"D":540.0,"B":165.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30307","gost":"7307","d":35.0,"D":80.0,"B":22.75,"type":"Роликовый конический","sap":1},{"iso":"6308-2RS1","gost":"","d":40.0,"D":90.0,"B":23.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6309-2RS1","gost":"","d":45.0,"D":100.0,"B":25.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6310-2RS1","gost":"","d":50.0,"D":110.0,"B":27.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"42520","gost":"","d":100.0,"D":180.0,"B":46.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"46118","gost":"","d":90.0,"D":140.0,"B":24.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"46120","gost":"","d":100.0,"D":150.0,"B":24.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60311","gost":"","d":55.0,"D":120.0,"B":29.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"46416","gost":"","d":80.0,"D":200.0,"B":48.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"42620","gost":"","d":100.0,"D":215.0,"B":73.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6311-2RS1","gost":"","d":55.0,"D":120.0,"B":29.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6312-2RS1","gost":"","d":60.0,"D":130.0,"B":31.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"1097768","gost":"","d":340.0,"D":580.0,"B":242.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22320","gost":"3620","d":100.0,"D":215.0,"B":73.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"6313-2RS1","gost":"","d":65.0,"D":140.0,"B":33.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60202","gost":"","d":15.0,"D":35.0,"B":11.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"53522","gost":"","d":110.0,"D":200.0,"B":53.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180505","gost":"","d":25.0,"D":52.0,"B":18.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6315","gost":"315","d":75.0,"D":160.0,"B":37.0,"type":"Шариковый радиальный","sap":1},{"iso":"6219","gost":"219","d":95.0,"D":170.0,"B":32.0,"type":"Шариковый радиальный","sap":1},{"iso":"7606","gost":"","d":30.0,"D":72.0,"B":28.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6314-2RS1","gost":"","d":70.0,"D":150.0,"B":35.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32207","gost":"7507","d":35.0,"D":72.0,"B":24.25,"type":"Роликовый конический","sap":1},{"iso":"30208","gost":"7208","d":40.0,"D":80.0,"B":19.75,"type":"Роликовый конический","sap":1},{"iso":"32210","gost":"7510","d":50.0,"D":90.0,"B":24.75,"type":"Роликовый конический","sap":1},{"iso":"7522","gost":"","d":110.0,"D":200.0,"B":56.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7526","gost":"","d":130.0,"D":230.0,"B":67.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6316-2RS1","gost":"","d":80.0,"D":170.0,"B":39.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7618","gost":"","d":90.0,"D":190.0,"B":67.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"24126","gost":"","d":130.0,"D":210.0,"B":80.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"807713","gost":"","d":65.0,"D":150.0,"B":54.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N320ECM","gost":"","d":100.0,"D":215.0,"B":47.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22232","gost":"3532","d":160.0,"D":290.0,"B":80.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"NU322ECM","gost":"","d":110.0,"D":240.0,"B":50.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU324ECM","gost":"","d":120.0,"D":260.0,"B":55.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30206","gost":"7206","d":30.0,"D":62.0,"B":17.25,"type":"Роликовый конический","sap":1},{"iso":"6318","gost":"","d":90.0,"D":190.0,"B":43.0,"type":"Шариковый радиальный","sap":1},{"iso":"11208","gost":"","d":40.0,"D":85.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180311","gost":"","d":55.0,"D":120.0,"B":29.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6324","gost":"","d":120.0,"D":260.0,"B":55.0,"type":"Шариковый радиальный","sap":1},{"iso":"32318КМ","gost":"","d":90.0,"D":190.0,"B":43.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"80019","gost":"","d":9.0,"D":24.0,"B":7.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22230CCW33","gost":"","d":150.0,"D":270.0,"B":73.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6212","gost":"212","d":60.0,"D":110.0,"B":22.0,"type":"Шариковый радиальный","sap":1},{"iso":"6209","gost":"209","d":45.0,"D":85.0,"B":19.0,"type":"Шариковый радиальный","sap":1},{"iso":"32224","gost":"","d":120.0,"D":215.0,"B":61.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6312","gost":"312","d":60.0,"D":130.0,"B":31.0,"type":"Шариковый радиальный","sap":1},{"iso":"6306","gost":"306","d":30.0,"D":72.0,"B":19.0,"type":"Шариковый радиальный","sap":1},{"iso":"60314","gost":"","d":70.0,"D":150.0,"B":35.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"23064","gost":"3003164","d":320.0,"D":480.0,"B":121.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"180303","gost":"","d":17.0,"D":47.0,"B":14.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"30205","gost":"7205","d":25.0,"D":52.0,"B":16.25,"type":"Роликовый конический","sap":1},{"iso":"7224","gost":"","d":120.0,"D":215.0,"B":43.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6313","gost":"313","d":65.0,"D":140.0,"B":33.0,"type":"Шариковый радиальный","sap":1},{"iso":"6302","gost":"302","d":15.0,"D":42.0,"B":13.0,"type":"Шариковый радиальный","sap":1},{"iso":"NN3026K","gost":"3182126","d":130.0,"D":200.0,"B":52.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"NJ212","gost":"42212","d":60.0,"D":110.0,"B":22.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"32413","gost":"","d":65.0,"D":160.0,"B":37.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32426","gost":"","d":130.0,"D":340.0,"B":78.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3638","gost":"","d":190.0,"D":400.0,"B":132.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"664913","gost":"","d":62.0,"D":70.0,"B":31.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32212","gost":"7512","d":60.0,"D":110.0,"B":29.75,"type":"Роликовый конический","sap":1},{"iso":"23040","gost":"3003140","d":200.0,"D":310.0,"B":82.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"42320","gost":"","d":100.0,"D":215.0,"B":47.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23244","gost":"","d":220.0,"D":400.0,"B":144.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"60313","gost":"","d":65.0,"D":140.0,"B":33.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6205","gost":"205","d":25.0,"D":52.0,"B":15.0,"type":"Шариковый радиальный","sap":1},{"iso":"6308","gost":"308","d":40.0,"D":90.0,"B":23.0,"type":"Шариковый радиальный","sap":1},{"iso":"6002","gost":"102","d":15.0,"D":32.0,"B":9.0,"type":"Шариковый радиальный","sap":1},{"iso":"46124","gost":"","d":120.0,"D":180.0,"B":28.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6304","gost":"304","d":20.0,"D":52.0,"B":15.0,"type":"Шариковый радиальный","sap":1},{"iso":"7318","gost":"46318","d":90.0,"D":190.0,"B":43.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"32214Д1","gost":"","d":70.0,"D":125.0,"B":24.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7308","gost":"46308","d":40.0,"D":90.0,"B":23.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"2318","gost":"","d":90.0,"D":190.0,"B":43.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"50202","gost":"","d":15.0,"D":35.0,"B":11.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6230","gost":"230","d":150.0,"D":270.0,"B":45.0,"type":"Шариковый радиальный","sap":1},{"iso":"402611","gost":"","d":55.0,"D":120.0,"B":43.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6210","gost":"210","d":50.0,"D":90.0,"B":20.0,"type":"Шариковый радиальный","sap":1},{"iso":"22244","gost":"","d":220.0,"D":400.0,"B":108.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180307","gost":"","d":35.0,"D":80.0,"B":21.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180607","gost":"","d":35.0,"D":80.0,"B":31.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6412","gost":"412","d":60.0,"D":150.0,"B":35.0,"type":"Шариковый радиальный","sap":1},{"iso":"12318","gost":"","d":90.0,"D":190.0,"B":43.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22328CCKW33","gost":"","d":140.0,"D":300.0,"B":102.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32206","gost":"7506","d":30.0,"D":62.0,"B":21.25,"type":"Роликовый конический","sap":1},{"iso":"6015","gost":"115","d":75.0,"D":115.0,"B":20.0,"type":"Шариковый радиальный","sap":1},{"iso":"6213","gost":"213","d":65.0,"D":120.0,"B":23.0,"type":"Шариковый радиальный","sap":1},{"iso":"6228","gost":"228","d":140.0,"D":250.0,"B":42.0,"type":"Шариковый радиальный","sap":1},{"iso":"22228","gost":"","d":140.0,"D":250.0,"B":68.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"1216","gost":"","d":80.0,"D":140.0,"B":26.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180209","gost":"","d":45.0,"D":85.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6222","gost":"222","d":110.0,"D":200.0,"B":38.0,"type":"Шариковый радиальный","sap":1},{"iso":"23244CCKC3W33","gost":"","d":220.0,"D":400.0,"B":144.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180610","gost":"","d":50.0,"D":110.0,"B":40.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"23144CCKW33","gost":"","d":220.0,"D":370.0,"B":120.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU207","gost":"32207","d":35.0,"D":72.0,"B":17.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"7216","gost":"46216Л","d":80.0,"D":140.0,"B":26.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"244","gost":"","d":220.0,"D":400.0,"B":64.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"30305","gost":"","d":25.0,"D":62.0,"B":18.25,"type":"Роликовый конический","sap":1},{"iso":"6201","gost":"201","d":12.0,"D":32.0,"B":10.0,"type":"Шариковый радиальный","sap":1},{"iso":"NU326","gost":"","d":130.0,"D":280.0,"B":58.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"42336","gost":"","d":180.0,"D":380.0,"B":75.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU219C3","gost":"","d":95.0,"D":170.0,"B":32.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU224C3","gost":"","d":120.0,"D":215.0,"B":40.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6224C3","gost":"","d":120.0,"D":215.0,"B":40.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6204","gost":"204","d":20.0,"D":47.0,"B":14.0,"type":"Шариковый радиальный","sap":1},{"iso":"6032","gost":"132","d":160.0,"D":240.0,"B":38.0,"type":"Шариковый радиальный","sap":1},{"iso":"180608","gost":"","d":40.0,"D":90.0,"B":33.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6019","gost":"119","d":95.0,"D":145.0,"B":24.0,"type":"Шариковый радиальный","sap":1},{"iso":"1311","gost":"","d":55.0,"D":120.0,"B":29.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7516","gost":"","d":80.0,"D":140.0,"B":35.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180602","gost":"","d":15.0,"D":42.0,"B":17.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32320","gost":"","d":100.0,"D":215.0,"B":47.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32524","gost":"","d":120.0,"D":215.0,"B":58.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22316","gost":"","d":80.0,"D":170.0,"B":58.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"6413","gost":"413","d":65.0,"D":160.0,"B":37.0,"type":"Шариковый радиальный","sap":1},{"iso":"7318 (90×190)","gost":"","d":90.0,"D":190.0,"B":46.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23052","gost":"3003152","d":260.0,"D":400.0,"B":104.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"7352","gost":"","d":260.0,"D":540.0,"B":109.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU309","gost":"32309","d":45.0,"D":100.0,"B":25.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"7605","gost":"","d":25.0,"D":62.0,"B":25.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22312","gost":"3612НЛ","d":60.0,"D":130.0,"B":46.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"18207","gost":"","d":35.0,"D":62.0,"B":22.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"30219","gost":"7219","d":95.0,"D":170.0,"B":34.5,"type":"Роликовый конический","sap":1},{"iso":"180309","gost":"","d":45.0,"D":100.0,"B":25.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"1307","gost":"","d":35.0,"D":80.0,"B":21.0,"type":"Шариковый сферический двухрядный","sap":1},{"iso":"60208","gost":"","d":40.0,"D":80.0,"B":18.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6217","gost":"217","d":85.0,"D":150.0,"B":28.0,"type":"Шариковый радиальный","sap":1},{"iso":"60309","gost":"","d":45.0,"D":100.0,"B":25.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180316","gost":"","d":80.0,"D":170.0,"B":39.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60304","gost":"","d":20.0,"D":52.0,"B":15.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6010","gost":"110","d":50.0,"D":80.0,"B":16.0,"type":"Шариковый радиальный","sap":1},{"iso":"22340CCKW33","gost":"","d":200.0,"D":420.0,"B":138.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"42234","gost":"","d":170.0,"D":310.0,"B":52.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23134CCKW33","gost":"","d":170.0,"D":280.0,"B":88.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"402311","gost":"","d":55.0,"D":120.0,"B":29.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22224","gost":"","d":120.0,"D":215.0,"B":58.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"32234","gost":"","d":170.0,"D":310.0,"B":52.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"1210","gost":"","d":50.0,"D":90.0,"B":20.0,"type":"Шариковый сферический двухрядный","sap":1},{"iso":"22330","gost":"3630","d":150.0,"D":320.0,"B":108.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"6215","gost":"215","d":75.0,"D":130.0,"B":25.0,"type":"Шариковый радиальный","sap":1},{"iso":"22317","gost":"3617","d":85.0,"D":180.0,"B":60.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"7536","gost":"","d":180.0,"D":320.0,"B":91.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"42232","gost":"","d":160.0,"D":290.0,"B":48.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6311","gost":"311","d":55.0,"D":120.0,"B":29.0,"type":"Шариковый радиальный","sap":1},{"iso":"23048","gost":"3003148","d":240.0,"D":360.0,"B":92.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"22322","gost":"3622","d":110.0,"D":240.0,"B":80.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"Q330","gost":"","d":150.0,"D":320.0,"B":65.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"1224","gost":"","d":120.0,"D":215.0,"B":42.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180205","gost":"","d":25.0,"D":52.0,"B":15.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180206","gost":"","d":30.0,"D":62.0,"B":16.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22324CCKW33","gost":"","d":120.0,"D":260.0,"B":86.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180306","gost":"","d":30.0,"D":72.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180308","gost":"","d":40.0,"D":90.0,"B":23.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22352","gost":"","d":260.0,"D":540.0,"B":165.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"80204","gost":"","d":20.0,"D":47.0,"B":14.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"61908","gost":"1000908","d":40.0,"D":62.0,"B":12.0,"type":"Шариковый радиальный","sap":1},{"iso":"13634","gost":"","d":170.0,"D":400.0,"B":132.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180609","gost":"","d":45.0,"D":100.0,"B":36.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"436208","gost":"","d":40.0,"D":80.0,"B":36.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"3632","gost":"","d":160.0,"D":340.0,"B":114.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7320","gost":"","d":100.0,"D":215.0,"B":51.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"60306","gost":"","d":30.0,"D":72.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6303","gost":"303","d":17.0,"D":47.0,"B":14.0,"type":"Шариковый радиальный","sap":1},{"iso":"22216","gost":"3516","d":80.0,"D":140.0,"B":33.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"80029","gost":"","d":9.0,"D":26.0,"B":8.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7622А","gost":"","d":110.0,"D":240.0,"B":84.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"46203","gost":"","d":17.0,"D":40.0,"B":12.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22232CCKC3W33","gost":"","d":160.0,"D":290.0,"B":80.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32226","gost":"","d":130.0,"D":230.0,"B":40.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"4-3182132К","gost":"","d":160.0,"D":240.0,"B":60.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180212","gost":"","d":60.0,"D":110.0,"B":22.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"3644","gost":"","d":220.0,"D":460.0,"B":145.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"60203","gost":"","d":17.0,"D":40.0,"B":12.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"5-8144","gost":"","d":220.0,"D":270.0,"B":37.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"32056X","gost":"2007156","d":280.0,"D":420.0,"B":87.0,"type":"Роликовый конический","sap":1},{"iso":"6203","gost":"203","d":17.0,"D":40.0,"B":12.0,"type":"Шариковый радиальный","sap":1},{"iso":"60201","gost":"","d":12.0,"D":32.0,"B":10.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"3640","gost":"","d":200.0,"D":420.0,"B":138.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30207 (35×72)","gost":"7207","d":35.0,"D":72.0,"B":18.25,"type":"Роликовый конический","sap":1},{"iso":"710","gost":"","d":50.0,"D":80.0,"B":11.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22312CAW33","gost":"","d":60.0,"D":130.0,"B":46.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22326CCW33","gost":"","d":130.0,"D":280.0,"B":93.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NN3032K","gost":"3182132","d":160.0,"D":240.0,"B":60.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"30209","gost":"7209","d":45.0,"D":85.0,"B":20.75,"type":"Роликовый конический","sap":1},{"iso":"7330","gost":"46330","d":150.0,"D":320.0,"B":65.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"60205","gost":"","d":25.0,"D":52.0,"B":15.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180310","gost":"","d":50.0,"D":110.0,"B":27.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"2097936","gost":"","d":180.0,"D":250.0,"B":95.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180207","gost":"","d":35.0,"D":72.0,"B":17.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6326","gost":"326","d":130.0,"D":280.0,"B":58.0,"type":"Шариковый радиальный","sap":1},{"iso":"180502","gost":"","d":15.0,"D":35.0,"B":14.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"1205","gost":"","d":25.0,"D":52.0,"B":15.0,"type":"Шариковый сферический двухрядный","sap":1},{"iso":"42626","gost":"","d":130.0,"D":280.0,"B":93.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"943/25","gost":"","d":25.0,"D":32.0,"B":25.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"61906","gost":"1000906","d":30.0,"D":47.0,"B":9.0,"type":"Шариковый радиальный","sap":1},{"iso":"60101","gost":"","d":12.0,"D":28.0,"B":8.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7310","gost":"46310","d":50.0,"D":110.0,"B":27.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"6006","gost":"106","d":30.0,"D":55.0,"B":13.0,"type":"Шариковый радиальный","sap":1},{"iso":"6410","gost":"410","d":50.0,"D":130.0,"B":31.0,"type":"Шариковый радиальный","sap":1},{"iso":"6008","gost":"108","d":40.0,"D":68.0,"B":15.0,"type":"Шариковый радиальный","sap":1},{"iso":"76-306ЕШ3","gost":"","d":30.0,"D":72.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"76-307ЕШ3","gost":"","d":35.0,"D":80.0,"B":21.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"3760","gost":"","d":300.0,"D":440.0,"B":105.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"50207","gost":"","d":35.0,"D":72.0,"B":17.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7209","gost":"36209","d":45.0,"D":85.0,"B":19.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"N308","gost":"2308","d":40.0,"D":90.0,"B":23.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"NU314","gost":"32314","d":70.0,"D":150.0,"B":35.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"31316J1QCL7A","gost":"","d":80.0,"D":170.0,"B":42.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NJ314","gost":"42314","d":70.0,"D":150.0,"B":35.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"23168CAKW33","gost":"","d":340.0,"D":580.0,"B":190.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"42428","gost":"","d":140.0,"D":360.0,"B":82.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"60214","gost":"","d":70.0,"D":125.0,"B":24.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22326CCC3W33","gost":"","d":130.0,"D":280.0,"B":93.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"53516","gost":"","d":80.0,"D":140.0,"B":33.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NJ211","gost":"42211","d":55.0,"D":100.0,"B":21.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"415","gost":"","d":75.0,"D":190.0,"B":45.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"1204","gost":"","d":20.0,"D":47.0,"B":14.0,"type":"Шариковый сферический двухрядный","sap":1},{"iso":"6-50706ЕУ1Ш3","gost":"","d":30.0,"D":75.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"76-207ЕШ3","gost":"","d":35.0,"D":72.0,"B":17.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"76-309ЕШ3","gost":"","d":45.0,"D":100.0,"B":25.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7611","gost":"","d":55.0,"D":120.0,"B":45.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"1310","gost":"","d":50.0,"D":110.0,"B":27.0,"type":"Шариковый сферический двухрядный","sap":1},{"iso":"53611","gost":"","d":55.0,"D":120.0,"B":43.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"60312","gost":"","d":60.0,"D":130.0,"B":31.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22230CAW33","gost":"","d":150.0,"D":270.0,"B":73.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"1312","gost":"","d":60.0,"D":130.0,"B":31.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22236CAW33","gost":"","d":180.0,"D":320.0,"B":86.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6004","gost":"104","d":20.0,"D":42.0,"B":12.0,"type":"Шариковый радиальный","sap":1},{"iso":"22308W33","gost":"","d":40.0,"D":90.0,"B":33.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"4074113","gost":"","d":65.0,"D":100.0,"B":35.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"16003","gost":"7000103","d":17.0,"D":35.0,"B":8.0,"type":"Шариковый радиальный","sap":1},{"iso":"3003776","gost":"","d":380.0,"D":620.0,"B":194.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23172CCKW33","gost":"","d":360.0,"D":600.0,"B":192.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"20703","gost":"","d":17.0,"D":40.0,"B":14.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"20803","gost":"","d":17.0,"D":47.0,"B":15.5,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22340CAKW33","gost":"","d":200.0,"D":420.0,"B":138.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6406","gost":"406","d":30.0,"D":90.0,"B":23.0,"type":"Шариковый радиальный","sap":1},{"iso":"941/15","gost":"","d":15.0,"D":20.0,"B":12.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"942/30","gost":"","d":30.0,"D":38.0,"B":24.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"12736","gost":"","d":180.0,"D":280.0,"B":50.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6020","gost":"120","d":100.0,"D":150.0,"B":24.0,"type":"Шариковый радиальный","sap":1},{"iso":"1612","gost":"","d":60.0,"D":130.0,"B":46.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"30204","gost":"7204","d":20.0,"D":47.0,"B":15.25,"type":"Роликовый конический","sap":1},{"iso":"7604","gost":"","d":20.0,"D":52.0,"B":22.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7306","gost":"46306","d":30.0,"D":72.0,"B":19.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"7210","gost":"46210","d":50.0,"D":90.0,"B":20.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"NN3022K","gost":"3182122","d":110.0,"D":170.0,"B":45.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"32006X","gost":"2007106","d":30.0,"D":55.0,"B":17.0,"type":"Роликовый конический","sap":1},{"iso":"66314","gost":"","d":70.0,"D":150.0,"B":35.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22311","gost":"3611","d":55.0,"D":120.0,"B":43.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"36302","gost":"","d":15.0,"D":42.0,"B":13.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32410","gost":"","d":50.0,"D":130.0,"B":31.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"709","gost":"","d":45.0,"D":75.0,"B":11.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22220CAW33","gost":"","d":100.0,"D":180.0,"B":46.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23176CAKC3W33","gost":"","d":380.0,"D":620.0,"B":194.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"942/35","gost":"","d":35.0,"D":43.0,"B":25.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"4024107","gost":"","d":46.0,"D":62.0,"B":27.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23148CCKW33","gost":"","d":240.0,"D":400.0,"B":128.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NN3028K","gost":"3182128","d":140.0,"D":210.0,"B":53.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"16006","gost":"7000106","d":30.0,"D":55.0,"B":9.0,"type":"Шариковый радиальный","sap":1},{"iso":"23152CCKW33","gost":"","d":260.0,"D":440.0,"B":144.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32016X","gost":"2007116","d":80.0,"D":125.0,"B":29.0,"type":"Роликовый конический","sap":1},{"iso":"22232CCKW33","gost":"","d":160.0,"D":290.0,"B":80.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"42326","gost":"","d":130.0,"D":280.0,"B":58.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3003792","gost":"","d":460.0,"D":760.0,"B":240.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"Ш20","gost":"","d":20.0,"D":35.0,"B":16.0,"type":"Шарнирный","sap":1,"noiso":1},{"iso":"80018","gost":"","d":8.0,"D":22.0,"B":7.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"46124Л","gost":"","d":120.0,"D":180.0,"B":28.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"53608","gost":"","d":40.0,"D":90.0,"B":33.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6005","gost":"105","d":25.0,"D":47.0,"B":12.0,"type":"Шариковый радиальный","sap":1},{"iso":"50304","gost":"","d":20.0,"D":52.0,"B":15.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"46114","gost":"","d":70.0,"D":110.0,"B":20.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32009X","gost":"2007109","d":45.0,"D":75.0,"B":20.0,"type":"Роликовый конический","sap":1},{"iso":"6-46314Л","gost":"","d":70.0,"D":150.0,"B":35.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"46202","gost":"","d":15.0,"D":35.0,"B":11.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"30218","gost":"7218","d":90.0,"D":160.0,"B":32.5,"type":"Роликовый конический","sap":1},{"iso":"13532","gost":"","d":160.0,"D":320.0,"B":86.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180305","gost":"","d":25.0,"D":62.0,"B":17.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7204","gost":"36204","d":20.0,"D":47.0,"B":14.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"22236CCW33","gost":"","d":180.0,"D":320.0,"B":86.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2626","gost":"","d":130.0,"D":280.0,"B":93.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180203","gost":"","d":17.0,"D":40.0,"B":12.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"30210","gost":"7210","d":50.0,"D":90.0,"B":21.75,"type":"Роликовый конический","sap":1},{"iso":"5-3182132","gost":"","d":160.0,"D":240.0,"B":60.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32209","gost":"7509","d":45.0,"D":85.0,"B":24.75,"type":"Роликовый конический","sap":1},{"iso":"NN3020K","gost":"3182120","d":100.0,"D":150.0,"B":37.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"6018","gost":"118","d":90.0,"D":140.0,"B":24.0,"type":"Шариковый радиальный","sap":1},{"iso":"66322Л","gost":"","d":110.0,"D":240.0,"B":50.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"1000921","gost":"","d":105.0,"D":145.0,"B":20.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22214","gost":"3514","d":70.0,"D":125.0,"B":31.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"6012","gost":"112","d":60.0,"D":95.0,"B":18.0,"type":"Шариковый радиальный","sap":1},{"iso":"2218","gost":"","d":90.0,"D":160.0,"B":30.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3309","gost":"3086309","d":45.0,"D":100.0,"B":39.7,"type":"Радиально-упорный шариковый","sap":1},{"iso":"7612","gost":"","d":60.0,"D":130.0,"B":48.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2315","gost":"","d":75.0,"D":160.0,"B":37.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"1208","gost":"","d":40.0,"D":80.0,"B":18.0,"type":"Шариковый сферический двухрядный","sap":1},{"iso":"46122","gost":"","d":110.0,"D":170.0,"B":28.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7610","gost":"","d":50.0,"D":110.0,"B":42.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7613","gost":"","d":65.0,"D":140.0,"B":51.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22234","gost":"3534","d":170.0,"D":310.0,"B":86.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"7606АУ","gost":"","d":30.0,"D":72.0,"B":28.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7517","gost":"","d":85.0,"D":160.0,"B":38.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7215","gost":"46215","d":75.0,"D":130.0,"B":25.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"60204","gost":"","d":20.0,"D":47.0,"B":14.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60307","gost":"","d":35.0,"D":80.0,"B":21.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60310","gost":"","d":50.0,"D":110.0,"B":27.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"80201","gost":"","d":12.0,"D":32.0,"B":10.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"782756","gost":"","d":280.0,"D":460.0,"B":200.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"696","gost":"1000096","d":6.0,"D":15.0,"B":5.0,"type":"Шариковый радиальный","sap":1},{"iso":"42152","gost":"","d":260.0,"D":400.0,"B":65.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NJ252M","gost":"","d":260.0,"D":480.0,"B":80.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"61902","gost":"1000902","d":15.0,"D":28.0,"B":7.0,"type":"Шариковый радиальный","sap":1},{"iso":"61905","gost":"1000905","d":25.0,"D":42.0,"B":9.0,"type":"Шариковый радиальный","sap":1},{"iso":"16008","gost":"7000108","d":40.0,"D":68.0,"B":9.0,"type":"Шариковый радиальный","sap":1},{"iso":"7815","gost":"","d":75.0,"D":135.0,"B":44.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"27308","gost":"","d":40.0,"D":90.0,"B":25.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32328","gost":"","d":140.0,"D":300.0,"B":62.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"42322","gost":"","d":110.0,"D":240.0,"B":50.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"42328","gost":"","d":140.0,"D":300.0,"B":62.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7316","gost":"46316","d":80.0,"D":170.0,"B":39.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"50706","gost":"","d":30.0,"D":75.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60018","gost":"","d":8.0,"D":22.0,"B":7.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60029","gost":"","d":9.0,"D":26.0,"B":8.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180201","gost":"","d":12.0,"D":32.0,"B":10.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180501","gost":"","d":12.0,"D":32.0,"B":14.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"986714","gost":"","d":70.0,"D":105.0,"B":21.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"2097152","gost":"","d":260.0,"D":400.0,"B":146.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3004244","gost":"","d":320.0,"D":580.0,"B":208.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU2326","gost":"","d":130.0,"D":280.0,"B":93.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3182140К","gost":"","d":200.0,"D":310.0,"B":82.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6221","gost":"221","d":105.0,"D":190.0,"B":36.0,"type":"Шариковый радиальный","sap":1},{"iso":"NU209","gost":"32209","d":45.0,"D":85.0,"B":19.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"60212","gost":"","d":60.0,"D":110.0,"B":22.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6030","gost":"130А","d":150.0,"D":225.0,"B":35.0,"type":"Шариковый радиальный","sap":1},{"iso":"80200","gost":"","d":10.0,"D":30.0,"B":9.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"80202","gost":"","d":15.0,"D":35.0,"B":11.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"693","gost":"1000093","d":3.0,"D":8.0,"B":3.0,"type":"Шариковый радиальный","sap":1},{"iso":"7320 (100×215)","gost":"46320","d":100.0,"D":215.0,"B":47.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"46112","gost":"","d":60.0,"D":95.0,"B":18.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"46115","gost":"","d":75.0,"D":115.0,"B":20.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180304","gost":"","d":20.0,"D":52.0,"B":15.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180603","gost":"","d":17.0,"D":47.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7607","gost":"","d":35.0,"D":80.0,"B":32.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23080","gost":"3003180","d":400.0,"D":600.0,"B":148.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"32336","gost":"","d":180.0,"D":380.0,"B":75.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"942/20","gost":"","d":20.0,"D":26.0,"B":20.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2232","gost":"","d":160.0,"D":290.0,"B":48.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"97168","gost":"","d":340.0,"D":520.0,"B":180.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"446117Л","gost":"","d":85.0,"D":130.0,"B":44.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"46117Л","gost":"","d":85.0,"D":130.0,"B":22.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"941/25","gost":"","d":25.0,"D":32.0,"B":16.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30308","gost":"7308","d":40.0,"D":90.0,"B":25.25,"type":"Роликовый конический","sap":1},{"iso":"1027328","gost":"","d":140.0,"D":300.0,"B":77.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3634","gost":"","d":170.0,"D":360.0,"B":120.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3552","gost":"","d":260.0,"D":480.0,"B":130.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6028","gost":"128","d":140.0,"D":210.0,"B":33.0,"type":"Шариковый радиальный","sap":1},{"iso":"61907","gost":"1000907","d":35.0,"D":55.0,"B":10.0,"type":"Шариковый радиальный","sap":1},{"iso":"180208","gost":"","d":40.0,"D":80.0,"B":18.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7206","gost":"36206","d":30.0,"D":62.0,"B":16.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"7207","gost":"36207","d":35.0,"D":72.0,"B":17.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"23044","gost":"","d":220.0,"D":340.0,"B":90.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"66322","gost":"","d":110.0,"D":240.0,"B":50.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"ШС20","gost":"","d":20.0,"D":35.0,"B":16.0,"type":"Шарнирный","sap":1,"noiso":1},{"iso":"61900","gost":"1000900","d":10.0,"D":22.0,"B":6.0,"type":"Шариковый радиальный","sap":1},{"iso":"4-697920Л1","gost":"","d":98.425,"D":152.4,"B":92.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7712М","gost":"","d":60.0,"D":120.0,"B":45.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2097972","gost":"","d":360.0,"D":480.0,"B":160.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3564","gost":"","d":320.0,"D":580.0,"B":150.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NJ2322E","gost":"","d":110.0,"D":240.0,"B":80.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU322","gost":"","d":110.0,"D":240.0,"B":50.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7203","gost":"","d":17.0,"D":40.0,"B":13.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7515","gost":"","d":75.0,"D":130.0,"B":33.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"1608","gost":"","d":40.0,"D":90.0,"B":33.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32232","gost":"","d":160.0,"D":290.0,"B":48.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180503","gost":"","d":17.0,"D":40.0,"B":16.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"ШСП25","gost":"","d":25.0,"D":42.0,"B":20.0,"type":"Шарнирный","sap":1,"noiso":1},{"iso":"6-7204","gost":"","d":20.0,"D":47.0,"B":15.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7202","gost":"","d":15.0,"D":35.0,"B":11.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32007X","gost":"2007107","d":35.0,"D":62.0,"B":18.0,"type":"Роликовый конический","sap":1},{"iso":"7211","gost":"36211","d":55.0,"D":100.0,"B":21.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"50305","gost":"","d":25.0,"D":62.0,"B":17.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"67513","gost":"","d":65.0,"D":120.0,"B":32.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"16010","gost":"7000110","d":50.0,"D":80.0,"B":10.0,"type":"Шариковый радиальный","sap":1},{"iso":"6200","gost":"200","d":10.0,"D":30.0,"B":9.0,"type":"Шариковый радиальный","sap":1},{"iso":"ШН55Ю","gost":"","d":55.0,"D":85.0,"B":40.0,"type":"Шарнирный","sap":1,"noiso":1},{"iso":"6009","gost":"109","d":45.0,"D":75.0,"B":16.0,"type":"Шариковый радиальный","sap":1},{"iso":"46109","gost":"","d":45.0,"D":75.0,"B":16.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60317","gost":"","d":85.0,"D":180.0,"B":41.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"926722","gost":"","d":110.0,"D":175.0,"B":30.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"16009","gost":"7000109","d":45.0,"D":75.0,"B":10.0,"type":"Шариковый радиальный","sap":1},{"iso":"60106","gost":"","d":30.0,"D":55.0,"B":13.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7326","gost":"","d":130.0,"D":280.0,"B":58.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"23036CCKW33","gost":"","d":180.0,"D":280.0,"B":74.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3004264","gost":"","d":320.0,"D":580.0,"B":208.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7615","gost":"","d":75.0,"D":160.0,"B":58.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32336М","gost":"","d":180.0,"D":380.0,"B":75.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"60310А","gost":"","d":50.0,"D":110.0,"B":27.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"942/32","gost":"","d":32.0,"D":40.0,"B":24.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7208","gost":"36208","d":40.0,"D":80.0,"B":18.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"46122Л","gost":"","d":110.0,"D":170.0,"B":28.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"50204","gost":"","d":20.0,"D":47.0,"B":14.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60104","gost":"","d":20.0,"D":42.0,"B":12.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"67510","gost":"","d":50.0,"D":90.0,"B":24.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"994713","gost":"","d":65.0,"D":80.0,"B":31.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"80026","gost":"","d":6.0,"D":19.0,"B":6.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"80027","gost":"","d":7.0,"D":22.0,"B":7.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"8244","gost":"","d":220.0,"D":300.0,"B":63.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"3042536ЛМ","gost":"","d":180.0,"D":320.0,"B":86.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3052536ЛМ","gost":"","d":180.0,"D":320.0,"B":86.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6-2007108А","gost":"","d":40.0,"D":68.0,"B":19.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"986714К1С23","gost":"","d":70.0,"D":105.0,"B":21.5,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7517А","gost":"","d":85.0,"D":150.0,"B":30.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"27320","gost":"","d":100.0,"D":215.0,"B":51.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"76-206Ю","gost":"","d":30.0,"D":62.0,"B":16.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"61802","gost":"1000802","d":15.0,"D":24.0,"B":5.0,"type":"Шариковый радиальный","sap":1},{"iso":"80201Ю","gost":"","d":12.0,"D":32.0,"B":10.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"608","gost":"","d":8.0,"D":22.0,"B":7.0,"type":"Шариковый радиальный","sap":1},{"iso":"7620","gost":"","d":100.0,"D":215.0,"B":77.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"4-17814","gost":"","d":70.0,"D":120.0,"B":65.44,"type":"Роликовый","sap":1,"noiso":1},{"iso":"29452","gost":"","d":260.0,"D":460.0,"B":132.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"97184","gost":"","d":420.0,"D":620.0,"B":206.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N305","gost":"2305","d":25.0,"D":62.0,"B":17.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"1СШС320К1","gost":"","d":320.0,"D":440.0,"B":160.0,"type":"Шарнирный","sap":1,"noiso":1},{"iso":"23176CAW33","gost":"","d":380.0,"D":620.0,"B":194.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23184CKJW33","gost":"","d":420.0,"D":700.0,"B":224.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3003748","gost":"","d":240.0,"D":400.0,"B":128.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"97727","gost":"","d":135.0,"D":220.0,"B":81.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"80203","gost":"","d":17.0,"D":40.0,"B":12.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32317Л","gost":"","d":85.0,"D":180.0,"B":41.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"1097760","gost":"","d":300.0,"D":500.0,"B":152.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"1097992","gost":"","d":460.0,"D":620.0,"B":131.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180104","gost":"","d":20.0,"D":42.0,"B":12.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"3620АМНК5","gost":"","d":100.0,"D":215.0,"B":73.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3618АМНК5","gost":"","d":90.0,"D":190.0,"B":64.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23060","gost":"3003160","d":300.0,"D":460.0,"B":118.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"2224","gost":"","d":120.0,"D":215.0,"B":40.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7528","gost":"","d":140.0,"D":250.0,"B":71.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3003296","gost":"","d":480.0,"D":870.0,"B":310.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30037/500","gost":"","d":500.0,"D":830.0,"B":264.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7609КУ","gost":"","d":45.0,"D":100.0,"B":38.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2220К","gost":"","d":100.0,"D":180.0,"B":34.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"9588217С9","gost":"","d":85.0,"D":125.0,"B":24.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"30212","gost":"7212А","d":60.0,"D":110.0,"B":23.75,"type":"Роликовый конический","sap":1},{"iso":"6234","gost":"234Л","d":170.0,"D":310.0,"B":52.0,"type":"Шариковый радиальный","sap":1},{"iso":"6326MC3","gost":"","d":130.0,"D":280.0,"B":58.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60027","gost":"","d":7.0,"D":22.0,"B":7.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"2234КМ","gost":"","d":170.0,"D":310.0,"B":52.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NF308","gost":"12308","d":40.0,"D":90.0,"B":23.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"1611","gost":"","d":55.0,"D":120.0,"B":23.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"1610","gost":"","d":50.0,"D":110.0,"B":40.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180204","gost":"","d":20.0,"D":47.0,"B":14.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180313","gost":"","d":65.0,"D":140.0,"B":33.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6014","gost":"114","d":70.0,"D":110.0,"B":20.0,"type":"Шариковый радиальный","sap":1},{"iso":"2226","gost":"","d":130.0,"D":230.0,"B":40.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N312","gost":"2312","d":60.0,"D":130.0,"B":31.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"2322","gost":"","d":110.0,"D":240.0,"B":50.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"27709","gost":"","d":45.0,"D":100.0,"B":31.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32228","gost":"","d":140.0,"D":250.0,"B":42.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6407","gost":"407","d":35.0,"D":100.0,"B":25.0,"type":"Шариковый радиальный","sap":1},{"iso":"6408","gost":"408","d":40.0,"D":110.0,"B":27.0,"type":"Шариковый радиальный","sap":1},{"iso":"30220","gost":"7220","d":100.0,"D":180.0,"B":37.0,"type":"Роликовый конический","sap":1},{"iso":"7608","gost":"","d":40.0,"D":90.0,"B":32.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"1313","gost":"","d":65.0,"D":140.0,"B":33.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"1314","gost":"","d":70.0,"D":150.0,"B":35.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"13520","gost":"","d":100.0,"D":200.0,"B":53.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180506","gost":"","d":30.0,"D":62.0,"B":20.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180612","gost":"","d":60.0,"D":130.0,"B":46.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"18324","gost":"","d":120.0,"D":210.0,"B":80.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"2217","gost":"","d":85.0,"D":150.0,"B":28.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6236","gost":"236","d":180.0,"D":320.0,"B":52.0,"type":"Шариковый радиальный","sap":1},{"iso":"NU216","gost":"32216","d":80.0,"D":140.0,"B":26.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"32222","gost":"","d":110.0,"D":200.0,"B":38.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU312","gost":"32312","d":60.0,"D":130.0,"B":31.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"32315","gost":"","d":75.0,"D":160.0,"B":37.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22218","gost":"3518","d":90.0,"D":160.0,"B":40.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"22220","gost":"3520Л","d":100.0,"D":180.0,"B":46.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"3608","gost":"","d":85.0,"D":150.0,"B":36.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3636","gost":"","d":180.0,"D":380.0,"B":126.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22309","gost":"3609","d":45.0,"D":100.0,"B":36.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"22315","gost":"3615","d":75.0,"D":160.0,"B":55.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"22326","gost":"3626","d":130.0,"D":280.0,"B":93.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"46115Л","gost":"","d":75.0,"D":115.0,"B":20.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"46117","gost":"","d":85.0,"D":130.0,"B":22.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"4074104","gost":"","d":20.0,"D":42.0,"B":22.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NJ207","gost":"42207","d":35.0,"D":72.0,"B":17.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"50205","gost":"","d":25.0,"D":52.0,"B":15.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"53516Н","gost":"","d":80.0,"D":140.0,"B":33.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"60206","gost":"","d":30.0,"D":62.0,"B":16.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60209","gost":"","d":45.0,"D":85.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"60308","gost":"","d":40.0,"D":90.0,"B":23.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"66412","gost":"","d":60.0,"D":150.0,"B":35.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7304","gost":"","d":20.0,"D":52.0,"B":16.25,"type":"Шариковый радиально-упорный","sap":1},{"iso":"7721","gost":"","d":105.0,"D":215.0,"B":77.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"98316","gost":"","d":80.0,"D":145.0,"B":45.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"986714КС17","gost":"","d":70.0,"D":105.0,"B":21.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7214","gost":"36214","d":70.0,"D":125.0,"B":24.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"7218","gost":"36218","d":90.0,"D":160.0,"B":30.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"80104","gost":"","d":20.0,"D":42.0,"B":12.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"2-697920Л1У","gost":"","d":98.425,"D":152.4,"B":92.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180214","gost":"","d":70.0,"D":125.0,"B":24.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"1306","gost":"","d":30.0,"D":72.0,"B":19.0,"type":"Шариковый сферический двухрядный","sap":1},{"iso":"22212","gost":"3512","d":60.0,"D":110.0,"B":28.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"7524А","gost":"","d":120.0,"D":215.0,"B":61.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6001-2RC","gost":"","d":12.0,"D":28.0,"B":8.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7304 (20×52)","gost":"46304","d":20.0,"D":52.0,"B":15.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"7305","gost":"46305","d":25.0,"D":62.0,"B":17.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"80218","gost":"","d":90.0,"D":160.0,"B":30.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6202-2RSH","gost":"","d":15.0,"D":35.0,"B":11.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6224","gost":"224","d":120.0,"D":215.0,"B":40.0,"type":"Шариковый радиальный","sap":1},{"iso":"ШС30","gost":"","d":30.0,"D":47.0,"B":22.0,"type":"Шарнирный","sap":1,"noiso":1},{"iso":"6218","gost":"218","d":90.0,"D":160.0,"B":30.0,"type":"Шариковый радиальный","sap":1},{"iso":"6314-2RS","gost":"","d":70.0,"D":150.0,"B":35.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6316-2RS","gost":"","d":80.0,"D":170.0,"B":39.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6306-2RS","gost":"","d":30.0,"D":72.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"180202","gost":"","d":15.0,"D":35.0,"B":11.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"NF210","gost":"12210","d":50.0,"D":90.0,"B":20.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"UC210","gost":"","d":50.0,"D":90.0,"B":51.6,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22322CAW33","gost":"","d":110.0,"D":240.0,"B":80.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22330CAW33","gost":"","d":150.0,"D":320.0,"B":108.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22308","gost":"","d":40.0,"D":90.0,"B":33.0,"type":"Сферический роликовый двухрядный","sap":1},{"iso":"N317ECM","gost":"","d":85.0,"D":180.0,"B":41.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"66410","gost":"","d":50.0,"D":130.0,"B":31.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"61916","gost":"1000916","d":80.0,"D":110.0,"B":16.0,"type":"Шариковый радиальный","sap":1},{"iso":"1027320","gost":"","d":100.0,"D":215.0,"B":56.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180206С17","gost":"","d":30.0,"D":62.0,"B":16.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"11309","gost":"","d":45.0,"D":110.0,"B":27.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22332","gost":"","d":160.0,"D":340.0,"B":114.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"29910С17","gost":"","d":50.0,"D":78.5,"B":17.5,"type":"Упорный","sap":1,"noiso":1},{"iso":"30312 (60×130)","gost":"","d":60.0,"D":130.0,"B":31.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"943/40","gost":"","d":40.0,"D":50.0,"B":38.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU311","gost":"32311","d":55.0,"D":120.0,"B":29.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"6334MC3","gost":"","d":170.0,"D":360.0,"B":72.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6307-2RS1C3","gost":"","d":35.0,"D":80.0,"B":21.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32236","gost":"","d":180.0,"D":320.0,"B":52.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"C2228C3","gost":"","d":140.0,"D":250.0,"B":68.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"70-326","gost":"","d":130.0,"D":280.0,"B":58.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6316C3","gost":"","d":80.0,"D":170.0,"B":39.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"29488EM","gost":"","d":440.0,"D":780.0,"B":206.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"4-3182140","gost":"","d":200.0,"D":310.0,"B":82.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"180204С17","gost":"","d":20.0,"D":47.0,"B":14.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32322М","gost":"","d":110.0,"D":240.0,"B":50.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"29352E","gost":"","d":260.0,"D":420.0,"B":95.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"80102","gost":"","d":15.0,"D":32.0,"B":9.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"3209","gost":"3056209","d":45.0,"D":85.0,"B":30.2,"type":"Радиально-упорный шариковый","sap":1},{"iso":"NJ208","gost":"42208","d":40.0,"D":80.0,"B":18.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"51124P5","gost":"","d":120.0,"D":155.0,"B":25.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"22232CCKW33+H3132","gost":"","d":160.0,"D":290.0,"B":80.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NN3018K","gost":"3182118","d":90.0,"D":140.0,"B":37.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"30-3652АМНК5","gost":"","d":260.0,"D":540.0,"B":165.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32324","gost":"","d":120.0,"D":260.0,"B":55.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"3003164Н","gost":"","d":320.0,"D":480.0,"B":121.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"1027328М","gost":"","d":140.0,"D":300.0,"B":77.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6200-2RSH","gost":"","d":10.0,"D":30.0,"B":9.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"ШС60","gost":"","d":60.0,"D":90.0,"B":44.0,"type":"Шарнирный","sap":1,"noiso":1},{"iso":"GE60ES","gost":"","d":60.0,"D":90.0,"B":44.0,"type":"Шарнирный","sap":1,"noiso":1},{"iso":"6208-2Z","gost":"","d":40.0,"D":80.0,"B":18.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"GEC320TXA-2RS","gost":"","d":320.0,"D":440.0,"B":160.0,"type":"Шарнирный","sap":1,"noiso":1},{"iso":"23220CCKW33","gost":"","d":100.0,"D":180.0,"B":60.3,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6324MC3","gost":"","d":120.0,"D":260.0,"B":55.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6319-2RS1C3","gost":"","d":95.0,"D":200.0,"B":45.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22336CCW33","gost":"","d":180.0,"D":380.0,"B":126.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6303-2RS1C3","gost":"","d":17.0,"D":47.0,"B":14.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6212-2RS1C3","gost":"","d":60.0,"D":110.0,"B":22.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"23140CCKW33+H3140","gost":"","d":180.0,"D":340.0,"B":112.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6317C3","gost":"","d":85.0,"D":180.0,"B":41.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"NU308","gost":"32308","d":40.0,"D":90.0,"B":23.0,"type":"Роликовый цилиндрический","sap":1},{"iso":"7322","gost":"","d":110.0,"D":240.0,"B":50.0,"type":"Шариковый радиально-упорный","sap":1},{"iso":"46116Л","gost":"","d":80.0,"D":125.0,"B":22.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"4308ATN9","gost":"","d":40.0,"D":90.0,"B":33.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"51113","gost":"","d":65.0,"D":90.0,"B":18.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"51216P6","gost":"","d":80.0,"D":115.0,"B":28.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"51110","gost":"","d":50.0,"D":70.0,"B":14.0,"type":"Упорный шариковый","sap":1},{"iso":"51217","gost":"","d":85.0,"D":125.0,"B":31.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"32222J2","gost":"","d":110.0,"D":200.0,"B":56.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30224J2","gost":"","d":120.0,"D":215.0,"B":43.5,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N318ECP","gost":"","d":90.0,"D":190.0,"B":43.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"51230M","gost":"","d":150.0,"D":215.0,"B":50.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"N316ECM","gost":"","d":80.0,"D":170.0,"B":39.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7018AC","gost":"","d":90.0,"D":140.0,"B":24.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7024AC","gost":"","d":120.0,"D":180.0,"B":28.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22338CCKW33+H2338","gost":"","d":170.0,"D":400.0,"B":132.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32206J2Q","gost":"","d":30.0,"D":62.0,"B":21.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"51117","gost":"","d":85.0,"D":110.0,"B":19.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"51118","gost":"","d":90.0,"D":120.0,"B":22.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"51218","gost":"","d":90.0,"D":135.0,"B":35.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"51205","gost":"","d":25.0,"D":47.0,"B":15.0,"type":"Упорный шариковый","sap":1},{"iso":"51224M","gost":"","d":120.0,"D":170.0,"B":39.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"6203-2RS1","gost":"","d":17.0,"D":40.0,"B":12.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7022AC","gost":"","d":110.0,"D":170.0,"B":28.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32209J2Q","gost":"","d":45.0,"D":85.0,"B":24.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6201-RSH","gost":"","d":12.0,"D":32.0,"B":10.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32215","gost":"","d":75.0,"D":130.0,"B":31.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32314BJ2QCL7C","gost":"","d":70.0,"D":150.0,"B":54.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32310J2QU4","gost":"","d":50.0,"D":110.0,"B":42.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2216ETN9","gost":"","d":80.0,"D":140.0,"B":33.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"7416CBM","gost":"","d":80.0,"D":200.0,"B":48.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"3313A","gost":"","d":65.0,"D":140.0,"B":58.7,"type":"Шариковый","sap":1,"noiso":1},{"iso":"3309DMA","gost":"","d":45.0,"D":100.0,"B":39.7,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6004-2Z","gost":"","d":20.0,"D":42.0,"B":12.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"N319ECP","gost":"","d":95.0,"D":200.0,"B":45.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU330ECM","gost":"","d":150.0,"D":320.0,"B":65.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N322ECM","gost":"","d":110.0,"D":240.0,"B":50.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N319ECM","gost":"","d":95.0,"D":200.0,"B":45.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"62310-2RS1","gost":"","d":50.0,"D":110.0,"B":40.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6311-2Z","gost":"","d":55.0,"D":120.0,"B":29.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"32307J2Q","gost":"","d":35.0,"D":80.0,"B":32.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N220ECP","gost":"","d":100.0,"D":180.0,"B":34.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"30306J2Q","gost":"","d":30.0,"D":72.0,"B":20.75,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N226ECP","gost":"","d":130.0,"D":230.0,"B":40.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N324ECM","gost":"","d":120.0,"D":260.0,"B":55.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"N315ECM","gost":"","d":75.0,"D":160.0,"B":37.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU3176MA","gost":"","d":380.0,"D":620.0,"B":194.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22340CCC3W33","gost":"","d":200.0,"D":420.0,"B":138.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23044CCKW33","gost":"","d":220.0,"D":340.0,"B":90.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23140CCKW33","gost":"","d":200.0,"D":340.0,"B":112.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6-7310А","gost":"","d":50.0,"D":110.0,"B":29.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"31328XJ2","gost":"","d":140.0,"D":300.0,"B":77.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"4T-30206","gost":"","d":30.0,"D":62.0,"B":17.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23220EAW33","gost":"","d":100.0,"D":180.0,"B":60.3,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22340CCW33","gost":"","d":200.0,"D":420.0,"B":138.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6-7509А","gost":"","d":45.0,"D":85.0,"B":23.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"4-17814Л","gost":"","d":70.0,"D":120.0,"B":65.44,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6307EEC3","gost":"","d":35.0,"D":80.0,"B":21.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"986714АЕС17","gost":"","d":70.0,"D":105.0,"B":21.5,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22248CCW33","gost":"","d":240.0,"D":440.0,"B":120.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"9039352","gost":"","d":260.0,"D":420.0,"B":95.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"N319","gost":"","d":95.0,"D":200.0,"B":45.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22236EMW33","gost":"","d":180.0,"D":320.0,"B":86.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6207-2ZC3WT","gost":"","d":35.0,"D":72.0,"B":17.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"3307A-2ZC3MT33","gost":"","d":35.0,"D":80.0,"B":34.9,"type":"Шариковый","sap":1,"noiso":1},{"iso":"6213-2RS1","gost":"","d":65.0,"D":120.0,"B":23.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"N316EXLM1C3","gost":"","d":80.0,"D":170.0,"B":39.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22340BEXLKC3","gost":"","d":200.0,"D":420.0,"B":138.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"29352E1XL","gost":"","d":260.0,"D":420.0,"B":95.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"22340BEXLC3","gost":"","d":200.0,"D":420.0,"B":138.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23056BEXLKC3","gost":"","d":280.0,"D":420.0,"B":106.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"2308ETN9","gost":"","d":40.0,"D":90.0,"B":33.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"23056CACW33","gost":"","d":280.0,"D":420.0,"B":106.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"7022ACDP4A","gost":"","d":110.0,"D":170.0,"B":28.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"2208E-2RS1TN9","gost":"","d":40.0,"D":80.0,"B":23.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"23052KMBC3W33","gost":"","d":260.0,"D":400.0,"B":104.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"8156Н","gost":"","d":280.0,"D":350.0,"B":53.0,"type":"Упорный","sap":1,"noiso":1},{"iso":"23056CAKW33","gost":"","d":280.0,"D":420.0,"B":106.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23224CCW33","gost":"","d":120.0,"D":215.0,"B":76.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"76-326","gost":"","d":130.0,"D":280.0,"B":58.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"NU317EMAC3","gost":"","d":85.0,"D":180.0,"B":41.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"QJ308N2MAC2L","gost":"","d":40.0,"D":90.0,"B":23.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"NU230MC3","gost":"","d":150.0,"D":270.0,"B":45.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6230C3","gost":"","d":150.0,"D":270.0,"B":45.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"2218Л","gost":"","d":90.0,"D":160.0,"B":30.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"22230MBW33","gost":"","d":150.0,"D":270.0,"B":73.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"NU222ECMC3","gost":"","d":110.0,"D":200.0,"B":38.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"23056CACC3W33","gost":"","d":280.0,"D":420.0,"B":106.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"62304/17-2RSC3","gost":"","d":17.0,"D":52.0,"B":21.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"22344CCC3W33","gost":"","d":220.0,"D":460.0,"B":145.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"32018","gost":"","d":90.0,"D":140.0,"B":32.0,"type":"Роликовый","sap":1,"noiso":1},{"iso":"6У-807813АК1","gost":"","d":65.0,"D":110.0,"B":30.25,"type":"Роликовый","sap":1,"noiso":1},{"iso":"ШС25","gost":"","d":25.0,"D":42.0,"B":20.0,"type":"Шарнирный","sap":1,"noiso":1},{"iso":"1306ETN9","gost":"","d":30.0,"D":72.0,"B":19.0,"type":"Шариковый","sap":1,"noiso":1},{"iso":"00001860","gost":"","d":15.0,"D":35.0,"B":11.0,"type":"Подшипник","sap":1,"noiso":1},{"iso":"0011424","gost":"","d":55.0,"D":120.0,"B":43.0,"type":"Подшипник","sap":1,"noiso":1},{"iso":"1758541","gost":"","d":170.0,"D":310.0,"B":82.0,"type":"Подшипник","sap":1,"noiso":1},{"iso":"2115573","gost":"","d":100.0,"D":180.0,"B":46.0,"type":"Подшипник","sap":1,"noiso":1},{"iso":"23238W33","gost":"","d":190.0,"D":340.0,"B":120.0,"type":"Роликовый","sap":1,"noiso":1}];
+const sapIso=new Set(sapDB.map(b=>b.iso));
+const staticBearingDB=[...richDB,...DB.filter(b=>!richDB.some(r=>r.iso==b.n)&&!sapIso.has(b.n)).map(b=>({iso:b.n,gost:gostOf(b),d:b.d,D:b.D,B:b.B,type:b.t})),...sapDB.filter(b=>!richDB.some(r=>r.iso==b.iso))];
+
+let customDB = JSON.parse(localStorage.getItem('custom_bearing_db') || '[]');
+let favorites = JSON.parse(localStorage.getItem('fav_bearings') || '[]');
+let currentModalItem = null;
+
+function getFullDB() {
+    return [...staticBearingDB, ...customDB];
+}
+
+function updateCounter() {
+    document.getElementById('db-counter').innerText = `База: ${getFullDB().length} шт.`;
+}
+
+window.onload = function() { updateCounter(); handleSearch(); updateFavCount(); };
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    document.querySelectorAll('.tab-btn')[['search','filter','ai','fav'].indexOf(tabName)].classList.add('active');
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+
+    if(tabName === 'fav') renderFavorites();
+}
+
+const SUFX={"2RS":"два резиновых уплотнения","2RSR":"два резиновых уплотнения","RS":"одно уплотнение","2Z":"две защитные шайбы","ZZ":"две защитные шайбы","Z":"одна защитная шайба","C2":"зазор меньше нормального","C3":"зазор больше нормального","C4":"зазор значительно больше нормального","P6":"класс точности P6","P5":"класс точности P5","P4":"класс точности P4","AC":"угол контакта 25°","A":"улучшенное исполнение (ГОСТ)","B":"угол контакта 40°","K":"конусное отверстие","M":"латунный сепаратор"};
+function findBearings(q) {
+    const keys = b => [String(b.iso).toUpperCase(), ...String(b.gost || "").toUpperCase().split(/\s*\/\s*/)];
+    const rank = b => { const k = keys(b); return k.includes(q) ? 0 : k.some(x => x.startsWith(q)) ? 1 : k.some(x => x.includes(q)) ? 2 : 9; };
+    const r = getFullDB().map(b => [rank(b), b]).filter(x => x[0] < 9).sort((a, b) => a[0] - b[0]);
+    return (r.some(x => x[0] < 2) ? r.filter(x => x[0] < 2) : r).map(x => x[1]);
+}
+function handleSearch() {
+    const raw = document.getElementById('search-input').value.trim().toUpperCase().replace(/\s+/g, "");
+    const container = document.getElementById('search-results');
+    if(!raw) { renderCards(getFullDB(), container); return; }
+    let res = findBearings(raw), note = "";
+    {
+        const m = raw.match(/^((?:NU|NJ|NF|N)?\d{3,5})[-\/]?([A-Z0-9\-\/]+)$/);
+        if(m && !res.some(b => [String(b.iso).toUpperCase(), ...String(b.gost || "").toUpperCase().split(/\s*\/\s*/)].includes(raw))) {
+            const base = findBearings(m[1]);
+            res = [...base, ...res.filter(b => !base.includes(b))];
+            note = (m[2].match(/2RSR?|RS|2Z|ZZ|Z|C[0-5]|P[0-6]|AC|A|B|K|M/g) || []).map(x => `<span class="tag-saved">${x}: ${SUFX[x] || ""}</span>`).join(" ");
+        }
+    }
+    if(!res.length) {
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 30px; background: var(--card-bg); border-radius: 12px; border: 1px dashed var(--deepseek-color);">
+                <p style="margin-bottom: 10px;">В базе подшипник не найден.</p>
+                <button class="btn btn-ds" onclick="searchViaAI(document.getElementById('search-input').value.trim())">🔍 Найти через ИИ и сохранить в базу</button>
+            </div>`;
+        return;
+    }
+    renderCards(res, container);
+    if(note) container.insertAdjacentHTML('afterbegin', `<div style="grid-column:1/-1">${note}</div>`);
+}
+
+function renderCards(data, container) {
+    const total = data.length; data = data.slice(0, 80);
+    container.innerHTML = data.map(item => {
+        const isFav = favorites.some(f => f.iso === item.iso);
+        const isCustom = customDB.some(c => c.iso === item.iso);
+        return `
+            <div class="card" onclick="openModal('${item.iso}')">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">${item.gost ? "ГОСТ " + item.gost + " / " : ""}${item.noiso ? "№ " : "ISO "}${item.iso}${isCustom ? '<span class="tag-saved">ИИ: проверить</span>' : ''}</div>
+                        <div class="card-subtitle">${item.type || 'Подшипник'}</div>
+                    </div>
+                    <button class="fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFav('${item.iso}')">★</button>
+                </div>
+                <div class="params-list">
+                    <div class="param-item"><span class="param-label">d (внутр.)</span><span class="param-value">${item.d} мм</span></div>
+                    <div class="param-item"><span class="param-label">D (наруж.)</span><span class="param-value">${item.D} мм</span></div>
+                    <div class="param-item"><span class="param-label">B (ширина)</span><span class="param-value">${item.B} мм</span></div>
+                    <div class="param-item"><span class="param-label">Масса</span><span class="param-value">${item.weight ? item.weight + " кг" : "—"}</span></div>
+                </div>
+                <button class="btn btn-outline" style="width: 100%; font-size: 0.85rem;">Детали</button>
+            </div>
+        `;
+    }).join('') + (total > 80 ? '<div style="grid-column:1/-1;color:var(--text-muted)">Показано 80 из ' + total + ': уточните запрос</div>' : '');
+}
+
+function saveBearingToLocalDB(o) {
+    if(!o) return false;
+    const iso = String(o.iso || "").trim().toUpperCase(), gost = String(o.gost || "").trim(), d = +o.d, D = +o.D, B = +o.B;
+    const key = iso || gost;
+    if(!key || !(d > 0 && D > d && B > 0)) return false;
+    if(getFullDB().some(b => String(b.iso).toUpperCase() === key || (gost && String(b.gost || "").split(/\s*\/\s*/).includes(gost)))) return false;
+    const n = v => +v > 0 ? +v : undefined;
+    customDB.push({ iso: key, gost, d, D, B, weight: n(o.weight), C: n(o.C), C0: n(o.C0), speed: n(o.speed), type: o.type || "Подшипник" });
+    localStorage.setItem('custom_bearing_db', JSON.stringify(customDB));
+    updateCounter();
+    return true;
+}
+
+function toggleFav(iso) {
+    const item = getFullDB().find(b => String(b.iso) === String(iso));
+    if(!item) return;
+    const i = favorites.findIndex(f => String(f.iso) === String(iso));
+    if(i >= 0) favorites.splice(i, 1); else favorites.push(item);
+    localStorage.setItem('fav_bearings', JSON.stringify(favorites));
+    updateFavCount(); handleSearch();
+    if(document.getElementById('tab-fav').classList.contains('active')) renderFavorites();
+}
+
+function updateFavCount() {
+    document.getElementById('fav-count').innerText = favorites.length;
+}
+
+function renderFavorites() {
+    renderCards(favorites, document.getElementById('fav-results'));
+}
+
+function applyFilter() {
+    const type = document.getElementById('filter-type').value;
+    const dMin = parseFloat(document.getElementById('filter-d-min').value) || 0;
+    const dMax = parseFloat(document.getElementById('filter-d-max').value) || Infinity;
+    const DMin = parseFloat(document.getElementById('filter-D-min').value) || 0;
+    const DMax = parseFloat(document.getElementById('filter-D-max').value) || Infinity;
+    const BMin = parseFloat(document.getElementById('filter-B-min').value) || 0;
+    const BMax = parseFloat(document.getElementById('filter-B-max').value) || Infinity;
+
+    const filtered = getFullDB().filter(b => {
+        if(type && b.type !== type) return false;
+        if(b.d < dMin || b.d > dMax) return false;
+        if(b.D < DMin || b.D > DMax) return false;
+        if(b.B < BMin || b.B > BMax) return false;
+        return true;
+    });
+
+    renderCards(filtered, document.getElementById('filter-results'));
+}
+
+function openModal(iso) {
+    const item = getFullDB().find(b => String(b.iso) === String(iso));
+    if(!item) return;
+
+    currentModalItem = item;
+    document.getElementById('modal-title').innerText = `${item.gost ? "ГОСТ " + item.gost + " / " : ""}${item.noiso ? "№ " : "ISO "}${item.iso}`;
+    document.getElementById('modal-subtitle').innerText = item.type || 'Подшипник';
+
+    document.getElementById('modal-body').innerHTML = `
+        <div class="params-list" style="grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px;">
+            <div class="param-item"><span class="param-label">Внутренний диаметр (d)</span><span class="param-value">${item.d} мм</span></div>
+            <div class="param-item"><span class="param-label">Внешний диаметр (D)</span><span class="param-value">${item.D} мм</span></div>
+            <div class="param-item"><span class="param-label">Ширина (B)</span><span class="param-value">${item.B} мм</span></div>
+            <div class="param-item"><span class="param-label">Масса</span><span class="param-value">${item.weight ? item.weight + " кг" : "—"}</span></div>
+            <div class="param-item"><span class="param-label">Грузоподъемность (C)</span><span class="param-value">${item.C ? item.C + " кН" : "—"}</span></div>
+            <div class="param-item"><span class="param-label">Грузоподъемность (C₀)</span><span class="param-value">${item.C0 ? item.C0 + " кН" : "—"}</span></div>
+        </div>
+    `;
+
+    document.getElementById('modal-detail').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('modal-detail').classList.remove('active');
+}
+
+function copyCardData() {
+    if(!currentModalItem) return;
+    const text = `Подшипник ISO ${currentModalItem.iso}${currentModalItem.gost ? " / ГОСТ " + currentModalItem.gost : ""}\nРазмеры: ${currentModalItem.d}x${currentModalItem.D}x${currentModalItem.B} мм`;
+    navigator.clipboard.writeText(text).then(() => alert('Скопировано!'));
+}
+
+const AI_URL = "";  // адрес вашего Cloudflare Worker (один раз, см. README)
+async function askAI() {
+    const prompt = document.getElementById('ai-prompt').value.trim();
+    if(!prompt) return;
+    document.getElementById('ai-output-container').style.display = 'block';
+    const out = document.getElementById('ai-output');
+    if(!AI_URL) { out.innerText = 'ИИ пока не подключён.'; return; }
+    if(!navigator.onLine) { out.innerText = 'Нет интернета. ИИ работает только онлайн, а база подшипников работает и без интернета.'; return; }
+    out.innerText = '⌛ Ищу ответ… (до минуты)';
+    try {
+        const r = await fetch(AI_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: prompt }) });
+        const o = await r.json();
+        if(!r.ok) throw new Error(o.error || 'HTTP ' + r.status);
+        const saved = saveBearingToLocalDB(o.bearing);
+        out.innerText = (o.answer || '') + (saved ? '\n\n✅ Сохранено в базу на вашем телефоне (данные ИИ: сверьте с каталогом).' : '') + (!saved && o.bearing ? '\n\nℹ️ Такой подшипник уже есть в базе или данные неполные.' : '');
+        handleSearch();
+    } catch(e) {
+        out.innerText = 'Не получилось: ' + e.message;
+    }
+}
+
+function searchViaAI(query) {
+    switchTab('ai');
+    document.getElementById('ai-prompt').value = `Найди полные характеристики, размеры d, D, B и аналоги подшипника "${query}" по ГОСТ и ISO.`;
+    askAI();
+}
+
+function consultModalAI() {
+    if(!currentModalItem) return;
+    closeModal();
+    switchTab('ai');
+    document.getElementById('ai-prompt').value = `Дай инженерные рекомендации по монтажу, допускам и зазорам для подшипника ${currentModalItem.iso}.`;
+    askAI();
+}
+function exportDB() {
+    if(!customDB.length) { alert('Своих подшипников пока нет'); return; }
+    const t = JSON.stringify(customDB);
+    navigator.clipboard.writeText(t).then(() => alert('Скопировано: ' + customDB.length + ' шт. Вставьте на другом устройстве через «Импорт».'), () => prompt('Скопируйте:', t));
+}
+function importDB() {
+    const t = prompt('Вставьте экспортированный список:');
+    if(!t) return;
+    try { const n = JSON.parse(t).filter(saveBearingToLocalDB).length; alert('Добавлено: ' + n); handleSearch(); } catch(e) { alert('Не удалось прочитать список'); }
+}
+window.addEventListener('load', () => {
+    document.getElementById('filter-type').innerHTML = '<option value="">Все типы</option>' + [...new Set(getFullDB().map(b => b.type))].map(t => `<option>${t}</option>`).join('');
+});
+let dp = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; document.getElementById('install-btn').style.display = 'inline-block'; });
+function installApp() { if(dp) { dp.prompt(); dp = null; document.getElementById('install-btn').style.display = 'none'; } }
+if(/iphone|ipad/i.test(navigator.userAgent) && !navigator.standalone) document.getElementById('ios-hint').style.display = 'block';
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+
+</body>
+</html>
