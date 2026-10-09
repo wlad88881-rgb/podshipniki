@@ -52,7 +52,7 @@ async function ask(batch) {
   }
   return null;
 }
-let done = 0;
+let done = 0, fails = 0;
 async function worker() {
   while (batches.length) {
     const batch = batches.shift(), items = await ask(batch);
@@ -61,7 +61,8 @@ async function worker() {
       batch.forEach(b => { prog[b.iso] = by[b.iso] ? clean(b, by[b.iso]) : {}; });
       fs.writeFileSync(progFile, JSON.stringify(prog));
     }
-    done += batch.length; console.log(`Готово ${done} из ${todo.length}`);
+    if (!items) { fails++; console.log("  этот блок НЕ выполнен (нет связи), будет повторён при следующем запуске"); }
+    done += batch.length; console.log(`Обработано ${done} из ${todo.length}`);
   }
 }
 (async () => {
@@ -73,5 +74,6 @@ async function worker() {
   }
   fs.writeFileSync(path.join(dir, "enrich-data.js"), "window.ENRICH=" + JSON.stringify(out) + ";\n");
   console.log(`\nИтог: принято записей ${Object.keys(out).length}; масса ${w}, C ${c}, C0 ${c0}; без данных (ИИ не уверен или значения отклонены): ${empty}`);
-  console.log("Файл enrich-data.js создан. Загрузите его на GitHub рядом с index.html.");
+  if (fails) console.log(`\nВНИМАНИЕ: не выполнено блоков: ${fails}. Проверьте интернет и запустите ещё раз: он продолжит с того же места.`);
+  else console.log("Файл enrich-data.js создан. Загрузите его на GitHub рядом с index.html.");
 })();
